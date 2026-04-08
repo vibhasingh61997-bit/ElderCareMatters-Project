@@ -1,0 +1,430 @@
+/* ============================================================
+   STYLE.CSS — ElderCareMatters
+   All visual styling lives here.
+   Organized in sections matching the HTML structure.
+============================================================ */
+
+
+/* ── RESET & BASE ─────────────────────────────────────────── */
+/* Remove browser default spacing and make box-sizing consistent */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  color: #111827;
+  background: #ffffff;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* ── LAYOUT HELPER ────────────────────────────────────────── */
+/* .container keeps content centered and never too wide */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  border: 2px solid transparent;
+}
+
+/* Blue filled button */
+.btn--primary {
+  background: #1D4ED8;
+  color: #ffffff;
+  border-color: #1D4ED8;
+}
+.btn--primary:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+}
+
+/* White outlined button (used in header) */
+.btn--outline {
+  background: transparent;
+  color: #1D4ED8;
+  border-color: #1D4ED8;
+  padding: 8px 18px;
+  font-size: 0.875rem;
+}
+.btn--outline:hover {
+  background: #EFF6FF;
+}
+
+/* White button (used on dark CTA banner) */
+.btn--white {
+  background: #ffffff;
+  color: #1D4ED8;
+  border-color: #ffffff;
+  white-space: nowrap;
+}
+.btn--white:hover {
+  background: #EFF6FF;
+}
+
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.header {
+  position: sticky;        /* stays at top when you scroll */
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 14px 0;
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header__logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1E3A5F;
+  letter-spacing: -0.5px;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 0.9rem;
+  color: #4B5563;
+}
+
+.header__nav a:not(.btn):hover {
+  color: #1D4ED8;
+}
+
+
+/* ── HERO SECTION ─────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  padding: 80px 0 72px;
+  text-align: center;
+}
+
+.hero__eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #1D4ED8;
+  margin-bottom: 16px;
+}
+
+.hero__title {
+  font-size: clamp(2rem, 5vw, 3rem); /* scales with screen size */
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.hero__subtitle {
+  font-size: 1.1rem;
+  color: #4B5563;
+  max-width: 560px;
+  margin: 0 auto 36px;
+}
+
+.hero__note {
+  font-size: 0.78rem;
+  color: #9CA3AF;
+  margin-top: 14px;
+}
+
+
+/* ── SEARCH BAR ───────────────────────────────────────────── */
+.search-bar {
+  display: flex;
+  max-width: 520px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within {
+  border-color: #1D4ED8;  /* highlight when user is typing */
+}
+
+.search-bar__input {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 1rem;
+  border: none;
+  outline: none;
+  background: #fff;
+  color: #111827;
+}
+
+.search-bar__input::placeholder {
+  color: #9CA3AF;
+}
+
+.search-bar__btn {
+  border-radius: 0;
+  padding: 16px 28px;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.search-bar__error {
+  color: #DC2626;
+  font-size: 0.82rem;
+  margin-top: 8px;
+  min-height: 20px; /* keeps layout stable even when empty */
+}
+
+
+/* ── SECTION BASE ─────────────────────────────────────────── */
+.section {
+  padding: 72px 0;
+}
+
+.section--gray {
+  background: #F9FAFB;
+}
+
+.section__title {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.section__subtitle {
+  text-align: center;
+  color: #6B7280;
+  font-size: 0.95rem;
+  margin-bottom: 48px;
+}
+
+
+/* ── SERVICES GRID ────────────────────────────────────────── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px;
+  background: #ffffff;
+  border: 2px solid #E5E7EB;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.service-card:hover {
+  border-color: #1D4ED8;
+  box-shadow: 0 4px 16px rgba(29, 78, 216, 0.12);
+  transform: translateY(-2px);
+}
+
+.service-card.selected {
+  border-color: #1D4ED8;
+  background: #EFF6FF;
+}
+
+.service-card__icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.service-card__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+
+/* ── HOW IT WORKS ─────────────────────────────────────────── */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px;
+}
+
+.step {
+  text-align: center;
+  padding: 32px 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+}
+
+.step__number {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #1D4ED8;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.step__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.step__desc {
+  font-size: 0.875rem;
+  color: #6B7280;
+  line-height: 1.6;
+}
+
+
+/* ── CTA BANNER ───────────────────────────────────────────── */
+.cta-banner {
+  background: #1D4ED8;
+  padding: 56px 0;
+}
+
+.cta-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.cta-banner__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.cta-banner__subtitle {
+  font-size: 0.95rem;
+  color: #BFDBFE;
+  max-width: 480px;
+}
+
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+.footer {
+  background: #F9FAFB;
+  border-top: 1px solid #E5E7EB;
+  padding: 40px 0;
+}
+
+.footer__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.footer__brand {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #1E3A5F;
+}
+
+.footer__links {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.footer__links a:hover {
+  color: #1D4ED8;
+}
+
+.footer__copy {
+  font-size: 0.78rem;
+  color: #9CA3AF;
+}
+
+
+/* ── TOAST NOTIFICATION ───────────────────────────────────── */
+/* A small popup that briefly appears to confirm an action */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px); /* starts off-screen */
+  background: #111827;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+/* ── RESPONSIVE (mobile adjustments) ─────────────────────── */
+@media (max-width: 640px) {
+  .header__nav a:not(.btn) {
+    display: none;  /* hide nav text links on small screens */
+  }
+
+  .search-bar {
+    flex-direction: column;
+    border-radius: 10px;
+  }
+
+  .search-bar__btn {
+    border-radius: 0 0 8px 8px;
+    width: 100%;
+  }
+
+  .cta-banner__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
