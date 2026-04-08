@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Providers — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .benefits-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:64px; }
+    .benefit-card  { display:flex; gap:14px; align-items:flex-start; }
+    .benefit-card__icon { font-size:1.6rem; flex-shrink:0; }
+    .benefit-card__title { font-size:.95rem; font-weight:700; margin-bottom:4px; }
+    .benefit-card__desc  { font-size:.85rem; color:var(--gray-500); line-height:1.6; }
+    .ppl-box { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:24px; text-align:center; margin-top:32px; }
+    .ppl-box h3 { font-size:1rem; font-weight:700; margin-bottom:6px; }
+    .ppl-box p  { font-size:.875rem; color:var(--gray-500); margin-bottom:12px; }
+    .formula-box { background:var(--navy); color:#fff; border-radius:var(--radius); padding:18px 24px; text-align:center; margin:32px auto; max-width:520px; }
+    .formula-box__label { font-size:.72rem; text-transform:uppercase; letter-spacing:1px; color:#93C5FD; margin-bottom:6px; }
+    .formula-box__eq    { font-size:1rem; font-weight:700; color:#fff; }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">Screen 3 · For Providers</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html" class="active">For Providers</a>
+        <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" style="padding:60px 0 52px;">
+    <div class="container">
+      <p class="hero__eyebrow">For Elder Care Professionals</p>
+      <h1 class="hero__title" style="font-size:clamp(1.8rem,4vw,2.6rem);">
+        A Predictable Source of<br>Qualified, Geo-Matched Leads
+      </h1>
+      <p class="hero__subtitle">
+        ElderCareMatters connects elder law attorneys, care managers, and senior care
+        providers with families actively seeking help — scored, priced, and matched by geography.
+      </p>
+      <a href="#pricing" class="btn btn--primary btn--lg" style="margin-top:8px;">See Plans & Pricing →</a>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="section section--white">
+    <div class="container">
+      <p class="section__eyebrow">Module E — Provider System</p>
+      <h2 class="section__title">Why Providers Choose ECM</h2>
+      <p class="section__subtitle">Transparent. Geo-matched. ROI-driven.</p>
+      <div class="benefits-grid">
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">📍</span>
+          <div>
+            <p class="benefit-card__title">Geo-matched leads only</p>
+            <p class="benefit-card__desc">Only receive leads from ZIP codes, cities, and states you actually serve.</p>
+          </div>
+        </div>
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">📊</span>
+          <div>
+            <p class="benefit-card__title">Scored before you buy</p>
+            <p class="benefit-card__desc">See Lead Quality Score (LQS) and Intent Score (LIS) before purchasing.</p>
+          </div>
+        </div>
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">💰</span>
+          <div>
+            <p class="benefit-card__title">Transparent pricing</p>
+            <p class="benefit-card__desc">Each lead has a clear price based on city, category, quality, and intent.</p>
+          </div>
+        </div>
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">🔒</span>
+          <div>
+            <p class="benefit-card__title">Limited competition</p>
+            <p class="benefit-card__desc">Max 3 providers per lead. You're not competing with 20 others.</p>
+          </div>
+        </div>
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">📈</span>
+          <div>
+            <p class="benefit-card__title">Measurable ROI</p>
+            <p class="benefit-card__desc">Track leads won/lost. See your cost per acquisition clearly in your dashboard.</p>
+          </div>
+        </div>
+        <div class="card benefit-card">
+          <span class="benefit-card__icon">✅</span>
+          <div>
+            <p class="benefit-card__title">ECM Verified badge</p>
+            <p class="benefit-card__desc">Display the ECM Verified badge on your profile to build consumer trust.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lead pricing formula -->
+      <div class="formula-box">
+        <p class="formula-box__label">Module B + C — Lead Scoring & Geo Pricing Formula</p>
+        <p class="formula-box__eq">Lead Price = Base City Price × Quality Score × Intent Score × Geo Relevance</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing plans -->
+  <section class="section section--gray" id="pricing">
+    <div class="container">
+      <p class="section__eyebrow">Module E2 — Subscription Plans</p>
+      <h2 class="section__title">Choose Your Plan</h2>
+      <p class="section__subtitle">Subscribe monthly. Cancel anytime. Scale as you grow.</p>
+
+      <div class="pricing-grid">
+
+        <!-- Base -->
+        <div class="pricing-card">
+          <p class="pricing-card__name">Base</p>
+          <p class="pricing-card__price">$149<span>/month</span></p>
+          <p class="pricing-card__coverage">📍 Coverage: 1 city</p>
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature"><span class="check">✓</span> Up to 10 leads/month</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Lead inbox</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Basic profile listing</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Email notifications</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Lead status tracking</li>
+          </ul>
+          <a href="#" class="btn btn--secondary" style="text-align:center;">Get Started</a>
+        </div>
+
+        <!-- Professional (highlighted) -->
+        <div class="pricing-card pricing-card--highlight">
+          <p class="pricing-card__badge">⭐ Most Popular</p>
+          <p class="pricing-card__name">Professional</p>
+          <p class="pricing-card__price">$299<span>/month</span></p>
+          <p class="pricing-card__coverage">📍 Coverage: City + radius or 3 cities</p>
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature"><span class="check">✓</span> Up to 20 leads/month</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Base</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> LQS + LIS scores visible</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Priority placement</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> ECM Verified badge</li>
+          </ul>
+          <a href="#" class="btn btn--primary" style="text-align:center;">Get Started</a>
+        </div>
+
+        <!-- Premium -->
+        <div class="pricing-card">
+          <p class="pricing-card__name">Premium</p>
+          <p class="pricing-card__price">Custom</p>
+          <p class="pricing-card__coverage">📍 Coverage: State or multi-state</p>
+          <ul class="pricing-card__features">
+            <li class="pricing-card__feature"><span class="check">✓</span> Unlimited leads</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Professional</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Dedicated account manager</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> CRM integration (coming soon)</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Featured provider badge</li>
+          </ul>
+          <a href="#" class="btn btn--secondary" style="text-align:center;">Contact Sales</a>
+        </div>
+
+      </div>
+
+      <!-- Pay-per-lead option -->
+      <div class="ppl-box">
+        <h3>Prefer pay-per-lead?</h3>
+        <p>Buy lead credits and purchase only the leads you want — priced per city, category, and lead quality score.</p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <div class="card" style="padding:14px 20px; text-align:center; min-width:120px;">
+            <p style="font-size:1.1rem; font-weight:800;">5 leads</p>
+            <p style="font-size:.8rem; color:var(--gray-500); margin:2px 0 8px;">$75</p>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Credits added!')">Buy</button>
+          </div>
+          <div class="card" style="padding:14px 20px; text-align:center; min-width:120px;">
+            <p style="font-size:1.1rem; font-weight:800;">10 leads</p>
+            <p style="font-size:.8rem; color:var(--gray-500); margin:2px 0 8px;">$130</p>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Credits added!')">Buy</button>
+          </div>
+          <div class="card" style="padding:14px 20px; text-align:center; min-width:120px;">
+            <p style="font-size:1.1rem; font-weight:800;">25 leads</p>
+            <p style="font-size:.8rem; color:var(--gray-500); margin:2px 0 8px;">$275</p>
+            <button class="btn btn--ghost btn--sm" onclick="showToast('Credits added!')">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Ready to start receiving leads?</h2>
+        <p class="cta-banner__subtitle">Create your provider account and go live in minutes.</p>
+      </div>
+      <a href="provider-dashboard.html" class="btn btn--white btn--lg">Go to Dashboard →</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">ElderCareMatters</p>
+      <div class="footer__links">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer__copy">© 2026 ElderCareMatters. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

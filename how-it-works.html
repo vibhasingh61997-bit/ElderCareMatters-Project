@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .step-detail { display:flex; gap:20px; align-items:flex-start; padding:28px 0; border-bottom:1px solid var(--gray-200); }
+    .step-detail:last-child { border-bottom:none; }
+    .step-detail__num { width:48px; height:48px; border-radius:50%; background:var(--blue-700); color:#fff; font-size:1.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-detail__title { font-size:1.05rem; font-weight:700; color:var(--gray-900); margin-bottom:6px; }
+    .step-detail__body  { font-size:.9rem; color:var(--gray-500); line-height:1.7; }
+    .trust-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:16px; }
+    .trust-item { display:flex; align-items:flex-start; gap:10px; font-size:.875rem; color:var(--gray-700); }
+    .trust-item__icon { font-size:1.1rem; margin-top:2px; }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">Screen 2 · How It Works</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html" class="active">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page hero -->
+  <section class="hero" style="padding:56px 0 48px;">
+    <div class="container">
+      <p class="hero__eyebrow">For Families</p>
+      <h1 class="hero__title" style="font-size:clamp(1.8rem,4vw,2.5rem);">How ElderCareMatters Works</h1>
+      <p class="hero__subtitle">A guided, transparent process — always free for families.</p>
+    </div>
+  </section>
+
+  <!-- Step-by-step detail -->
+  <section class="section section--white">
+    <div class="container" style="max-width:720px;">
+
+      <div class="step-detail">
+        <div class="step-detail__num">1</div>
+        <div>
+          <p class="step-detail__title">You describe the care need</p>
+          <p class="step-detail__body">
+            Use our guided intake — a short chat or form. You tell us who needs care, what type of service,
+            where they are located (ZIP code), how urgent it is, and your budget range.
+            Takes under 2 minutes.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-detail">
+        <div class="step-detail__num">2</div>
+        <div>
+          <p class="step-detail__title">We score and match your request</p>
+          <p class="step-detail__body">
+            Your submission becomes a <strong>lead</strong>. Our system automatically scores it for
+            data quality and conversion intent, then finds providers in your area who cover your
+            ZIP code and service type. Geography is the primary matching layer.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-detail">
+        <div class="step-detail__num">3</div>
+        <div>
+          <p class="step-detail__title">Providers are notified</p>
+          <p class="step-detail__body">
+            Verified providers in your area see your request — your care type, city, urgency,
+            and budget range — before deciding to respond. Your full contact info stays hidden
+            until a provider purchases your lead.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-detail">
+        <div class="step-detail__num">4</div>
+        <div>
+          <p class="step-detail__title">Providers reach out through the platform</p>
+          <p class="step-detail__body">
+            Providers who match your needs send a message through ElderCareMatters.
+            You receive it in your consumer dashboard and via email. Your personal contact
+            info stays protected until you choose to share it directly.
+          </p>
+        </div>
+      </div>
+
+      <div class="step-detail">
+        <div class="step-detail__num">5</div>
+        <div>
+          <p class="step-detail__title">You choose who to work with</p>
+          <p class="step-detail__body">
+            You are never obligated to work with anyone. Review provider profiles, credentials,
+            and messages. Then connect directly with the one that feels right for your family.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Trust section -->
+  <section class="section section--gray">
+    <div class="container" style="max-width:800px;">
+      <p class="section__eyebrow">Module K — Trust Framework</p>
+      <h2 class="section__title">Why Families Trust ElderCareMatters</h2>
+      <p class="section__subtitle">Every provider on the platform goes through our verification process.</p>
+      <div class="trust-row">
+        <div class="trust-item">
+          <span class="trust-item__icon">✅</span>
+          <div><strong>ECM Verified Badge</strong><br>Business legitimacy checked before listing.</div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__icon">🏅</span>
+          <div><strong>Credential Display</strong><br>Licenses and certifications shown as claimed or verified.</div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__icon">💬</span>
+          <div><strong>Platform Messaging</strong><br>Providers contact you through ECM — no cold calls.</div>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__icon">🔒</span>
+          <div><strong>Data Protection</strong><br>Your contact info is never sold or shared without consent.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Ready to find care?</h2>
+        <p class="cta-banner__subtitle">Start your free match — takes less than 2 minutes.</p>
+      </div>
+      <a href="index.html#chatbot" class="btn btn--white btn--lg">Get My Free Match →</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">ElderCareMatters</p>
+      <div class="footer__links">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer__copy">© 2026 ElderCareMatters. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

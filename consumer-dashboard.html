@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Care Request — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .consumer-layout { max-width:720px; margin:0 auto; padding:40px 24px; }
+    .section-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--blue-700); margin-bottom:8px; }
+    .replied-note { font-size:.78rem; color:var(--green-600); font-weight:600; }
+    .note-box { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:16px 20px; font-size:.875rem; color:var(--gray-600); line-height:1.65; margin-top:24px; }
+    .note-box strong { color:var(--gray-800); }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">Screen 6 · Consumer Dashboard</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="index.html" class="btn btn--ghost btn--sm">← Back to Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="consumer-layout">
+
+    <!-- Page header -->
+    <div style="margin-bottom:28px;">
+      <h1 style="font-size:1.6rem; font-weight:800; color:var(--gray-900); margin-bottom:4px;">
+        Your Care Request
+      </h1>
+      <p style="font-size:.875rem; color:var(--gray-500);">
+        Track provider responses and manage your search. Logged in as <strong>Sarah M.</strong>
+      </p>
+    </div>
+
+    <!-- Request summary card -->
+    <div style="margin-bottom:28px;">
+      <p class="section-label">Module G — Your Request Summary</p>
+      <div class="request-summary">
+        <div class="request-summary__row">
+          <span class="request-summary__label">Care type</span>
+          <span class="request-summary__value">Home Care</span>
+        </div>
+        <div class="request-summary__row">
+          <span class="request-summary__label">Location</span>
+          <span class="request-summary__value">Austin, TX 78701</span>
+        </div>
+        <div class="request-summary__row">
+          <span class="request-summary__label">Urgency</span>
+          <span class="request-summary__value">Urgent — within a week</span>
+        </div>
+        <div class="request-summary__row">
+          <span class="request-summary__label">Budget</span>
+          <span class="request-summary__value">$3,000–$4,000/mo</span>
+        </div>
+        <div class="request-summary__row">
+          <span class="request-summary__label">Submitted</span>
+          <span class="request-summary__value">April 8, 2026</span>
+        </div>
+        <div class="request-summary__row">
+          <span class="request-summary__label">Status</span>
+          <span class="request-summary__value">
+            <span class="badge badge--green">Matched — 2 providers notified</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Provider responses -->
+    <div>
+      <p class="section-label">Module H — Provider Responses (2)</p>
+
+      <!-- Response 1 — not yet replied -->
+      <div class="message-card">
+        <div class="message-card__header">
+          <div>
+            <p class="message-card__name">
+              Sunrise Home Care
+              <span class="badge badge--blue" style="margin-left:6px;">ECM Verified ✓</span>
+            </p>
+            <p class="message-card__meta">Home Care Agency · Austin, TX</p>
+          </div>
+          <span class="message-card__time">2 hours ago</span>
+        </div>
+        <p class="message-card__body">
+          "Hi Sarah! We specialise in home care in the Austin area and have immediate availability.
+          Our caregivers are fully licensed and background-checked. We'd love to discuss how we can
+          help your family — are you available for a quick call this week?"
+        </p>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn btn--primary btn--sm" onclick="showToast('Reply sent to Sunrise Home Care')">Reply to Sunrise</button>
+          <button class="btn btn--ghost btn--sm" onclick="showToast('Profile opened')">View Profile</button>
+        </div>
+      </div>
+
+      <!-- Response 2 — already replied -->
+      <div class="message-card">
+        <div class="message-card__header">
+          <div>
+            <p class="message-card__name">
+              Caring Hands Agency
+              <span class="badge badge--blue" style="margin-left:6px;">ECM Verified ✓</span>
+            </p>
+            <p class="message-card__meta">Home Care Agency · Austin, TX</p>
+          </div>
+          <span class="message-card__time">Yesterday</span>
+        </div>
+        <p class="message-card__body">
+          "Hello Sarah! We have immediate availability in your area and all our caregivers are
+          fully licensed and insured. Would you like to schedule a free in-home consultation
+          at no obligation?"
+        </p>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span class="replied-note">✓ You replied — awaiting their response</span>
+          <button class="btn btn--ghost btn--sm" onclick="showToast('Profile opened')">View Profile</button>
+        </div>
+      </div>
+
+    </div><!-- end responses -->
+
+    <!-- Helpful note -->
+    <div class="note-box">
+      <strong>You are never obligated</strong> to work with any provider. Take your time,
+      review their profiles and messages, and connect directly with the one that feels right for your family.
+      All communication through ElderCareMatters is safe and controlled — your personal contact
+      information is only shared when you choose to share it.
+    </div>
+
+    <!-- Edit request -->
+    <div style="margin-top:24px; text-align:center;">
+      <button class="btn btn--ghost btn--sm" onclick="showToast('Edit mode coming soon')">
+        ✏️ Update My Request
+      </button>
+      &nbsp;
+      <button class="btn btn--ghost btn--sm" onclick="showToast('Request closed')">
+        ✕ Close This Request
+      </button>
+    </div>
+
+  </div><!-- end consumer-layout -->
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">ElderCareMatters</p>
+      <div class="footer__links">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer__copy">© 2026 ElderCareMatters. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
