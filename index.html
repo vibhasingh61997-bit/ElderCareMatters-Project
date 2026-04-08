@@ -1,97 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ElderCareMatters</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f9fc;
-      text-align: center;
-    }
-
-    .hero {
-      background: #2b6cb0;
-      color: white;
-      padding: 60px 20px;
-    }
-
-    .hero h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
-    .hero p {
-      font-size: 18px;
-      opacity: 0.9;
-    }
-
-    .search-box {
-      margin-top: 20px;
-    }
-
-    input {
-      padding: 12px;
-      width: 200px;
-      border: none;
-      border-radius: 6px;
-      margin-right: 10px;
-    }
-
-    button {
-      padding: 12px 20px;
-      background: #48bb78;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .section {
-      padding: 40px 20px;
-    }
-
-    .cards {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 200px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ElderCareMatters — Find Trusted Elder Care Near You</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-  <div class="hero">
-    <h1>Find the Right Elder Care, Close to Home</h1>
-    <p>We match you with trusted local providers</p>
+  <span class="wf-label">Screen 1 · Homepage</span>
 
-    <div class="search-box">
-      <input placeholder="Enter ZIP code">
-      <button>Find Care</button>
+  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
+      </nav>
     </div>
-  </div>
+  </header>
 
-  <div class="section">
-    <h2>Browse by Care Type</h2>
+  <!-- ── HERO ────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <p class="hero__eyebrow">Trusted Elder Care Matching · Free for Families</p>
+      <h1 class="hero__title">Find the Right Elder Care,<br>Close to Home</h1>
+      <p class="hero__subtitle">
+        Answer a few questions and we'll connect you with verified local providers —
+        home care, assisted living, elder law, and more.
+      </p>
 
-    <div class="cards">
-      <div class="card">🏠 Home Care</div>
-      <div class="card">🏡 Assisted Living</div>
-      <div class="card">🧠 Memory Care</div>
-      <div class="card">⚖️ Elder Law</div>
+      <!-- Search bar -->
+      <div class="search-bar" id="search-bar">
+        <input id="zip-input" class="search-bar__input" type="text"
+               placeholder="Enter your ZIP code (e.g. 78701)" maxlength="5" />
+        <button class="search-bar__btn" onclick="handleSearch()">Find Care Near Me</button>
+      </div>
+      <p class="search-error" id="search-error"></p>
+      <p class="hero__note">No cost to families &nbsp;·&nbsp; Providers are pre-screened &nbsp;·&nbsp; No spam</p>
     </div>
-  </div>
+  </section>
 
+  <!-- ── INTAKE CHATBOT ───────────────────────────────────── -->
+  <section class="section section--white">
+    <div class="container">
+      <p class="section__eyebrow">Module A — Guided Intake</p>
+      <h2 class="section__title">Start Your Free Match</h2>
+      <p class="section__subtitle">Answer 6 short questions. Takes under 2 minutes.</p>
+
+      <!-- Chatbot widget — driven by script.js renderChatStep() -->
+      <div class="chatbot" id="chatbot">
+        <div class="chatbot__progress-bar">
+          <div class="chatbot__progress-fill" style="width:0%"></div>
+        </div>
+        <div class="chatbot__body">
+          <p class="chatbot__step-label"></p>
+          <p class="chatbot__question"></p>
+          <div class="chatbot__answer-area"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CARE TYPES ───────────────────────────────────────── -->
+  <section class="section section--gray" id="services">
+    <div class="container">
+      <p class="section__eyebrow">Module F — Directory</p>
+      <h2 class="section__title">Browse by Care Type</h2>
+      <p class="section__subtitle">Select a category to explore providers.</p>
+      <div class="services-grid">
+        <div class="service-card" onclick="selectService('Home Care')">
+          <span class="service-card__icon">🏠</span>
+          <span class="service-card__label">Home Care</span>
+        </div>
+        <div class="service-card" onclick="selectService('Assisted Living')">
+          <span class="service-card__icon">🏡</span>
+          <span class="service-card__label">Assisted Living</span>
+        </div>
+        <div class="service-card" onclick="selectService('Memory Care')">
+          <span class="service-card__icon">🧠</span>
+          <span class="service-card__label">Memory Care</span>
+        </div>
+        <div class="service-card" onclick="selectService('Elder Law')">
+          <span class="service-card__icon">⚖️</span>
+          <span class="service-card__label">Elder Law</span>
+        </div>
+        <div class="service-card" onclick="selectService('Care Management')">
+          <span class="service-card__icon">📋</span>
+          <span class="service-card__label">Care Management</span>
+        </div>
+        <div class="service-card" onclick="selectService('Hospice')">
+          <span class="service-card__icon">🤝</span>
+          <span class="service-card__label">Hospice</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ─────────────────────────────────────── -->
+  <section class="section section--white">
+    <div class="container">
+      <p class="section__eyebrow">Platform Overview</p>
+      <h2 class="section__title">How ElderCareMatters Works</h2>
+      <p class="section__subtitle">Simple, guided, and free for families.</p>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step__num">1</div>
+          <h3 class="step__title">Answer a few questions</h3>
+          <p class="step__desc">Tell us who needs care, the type, location, urgency, and budget. Takes under 2 minutes.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">2</div>
+          <h3 class="step__title">We score and match</h3>
+          <p class="step__desc">Your request is scored for quality and intent, then matched to verified providers in your area.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">3</div>
+          <h3 class="step__title">Providers reach out</h3>
+          <p class="step__desc">Matched providers contact you through the platform. You choose who to work with — no obligation.</p>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:32px;">
+        <a href="how-it-works.html" class="btn btn--secondary">See Full Walkthrough →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROVIDER CTA ─────────────────────────────────────── -->
+  <section class="cta-banner">
+    <div class="container cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Are you a care provider or elder law attorney?</h2>
+        <p class="cta-banner__subtitle">
+          Access geo-matched, scored leads with transparent pricing and measurable ROI.
+        </p>
+      </div>
+      <a href="for-providers.html" class="btn btn--white btn--lg">See Provider Plans →</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ───────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">ElderCareMatters</p>
+      <div class="footer__links">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </div>
+      <p class="footer__copy">© 2026 ElderCareMatters. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>
