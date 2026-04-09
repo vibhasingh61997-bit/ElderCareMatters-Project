@@ -44,8 +44,22 @@
     </div>
   </section>
 
+  <!-- ── SEARCH RESULTS ──────────────────────────────────── -->
+  <section class="section section--white" id="search-results" style="display:none; padding-top:40px;">
+    <div class="container">
+      <p class="section__eyebrow" id="results-eyebrow"></p>
+      <h2 class="section__title" id="results-title"></h2>
+      <p class="section__subtitle" id="results-subtitle"></p>
+      <div id="provider-results-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; margin-top:28px;"></div>
+      <div style="text-align:center; margin-top:32px;">
+        <p style="font-size:.875rem; color:var(--gray-500); margin-bottom:16px;">Want us to find you the best match? Answer a few questions below.</p>
+        <a href="#chatbot-section" class="btn btn--primary" onclick="document.getElementById('chatbot-section').scrollIntoView({behavior:'smooth'}); return false;">Start Free Match →</a>
+      </div>
+    </div>
+  </section>
+
   <!-- ── INTAKE CHATBOT ───────────────────────────────────── -->
-  <section class="section section--white">
+  <section class="section section--white" id="chatbot-section">
     <div class="container">
       <p class="section__eyebrow">Module A — Guided Intake</p>
       <h2 class="section__title">Start Your Free Match</h2>

@@ -25,7 +25,102 @@ function showToast(msg, duration = 2800) {
 
 /* ── SEARCH BAR ───────────────────────────────────────────── */
 
-/** Validate ZIP and trigger the "search" */
+/* ZIP → city/state lookup (covers major US metros) */
+const ZIP_CITIES = {
+  // Texas
+  '78701':'Austin, TX','78702':'Austin, TX','78703':'Austin, TX','78704':'Austin, TX',
+  '78741':'Austin, TX','78745':'Austin, TX','78746':'Austin, TX','78748':'Austin, TX',
+  '77001':'Houston, TX','77002':'Houston, TX','77003':'Houston, TX','77004':'Houston, TX',
+  '77401':'Houston, TX','77005':'Houston, TX',
+  '75201':'Dallas, TX','75202':'Dallas, TX','75203':'Dallas, TX','75204':'Dallas, TX',
+  '78201':'San Antonio, TX','78202':'San Antonio, TX','78203':'San Antonio, TX',
+  // New York
+  '10001':'New York, NY','10002':'New York, NY','10003':'New York, NY','10004':'New York, NY',
+  '10021':'New York, NY','10022':'New York, NY','10023':'New York, NY','10036':'New York, NY',
+  '11201':'Brooklyn, NY','11202':'Brooklyn, NY','11203':'Brooklyn, NY','11210':'Brooklyn, NY',
+  '11101':'Queens, NY','11102':'Queens, NY','11103':'Queens, NY',
+  // California
+  '90001':'Los Angeles, CA','90002':'Los Angeles, CA','90003':'Los Angeles, CA',
+  '90210':'Beverly Hills, CA','90211':'Beverly Hills, CA',
+  '94102':'San Francisco, CA','94103':'San Francisco, CA','94104':'San Francisco, CA',
+  '94105':'San Francisco, CA','94110':'San Francisco, CA',
+  '92101':'San Diego, CA','92102':'San Diego, CA','92103':'San Diego, CA',
+  // Illinois
+  '60601':'Chicago, IL','60602':'Chicago, IL','60603':'Chicago, IL','60604':'Chicago, IL',
+  '60611':'Chicago, IL','60614':'Chicago, IL','60615':'Chicago, IL',
+  // Florida
+  '33101':'Miami, FL','33102':'Miami, FL','33109':'Miami, FL','33125':'Miami, FL',
+  '32801':'Orlando, FL','32802':'Orlando, FL','32803':'Orlando, FL',
+  '33601':'Tampa, FL','33602':'Tampa, FL','33603':'Tampa, FL',
+  // Georgia
+  '30301':'Atlanta, GA','30302':'Atlanta, GA','30303':'Atlanta, GA','30308':'Atlanta, GA',
+  // Arizona
+  '85001':'Phoenix, AZ','85002':'Phoenix, AZ','85003':'Phoenix, AZ','85004':'Phoenix, AZ',
+  // Pennsylvania
+  '19101':'Philadelphia, PA','19102':'Philadelphia, PA','19103':'Philadelphia, PA',
+  // Washington
+  '98101':'Seattle, WA','98102':'Seattle, WA','98103':'Seattle, WA','98104':'Seattle, WA',
+  // Massachusetts
+  '02101':'Boston, MA','02102':'Boston, MA','02108':'Boston, MA','02109':'Boston, MA',
+  '02110':'Boston, MA','02111':'Boston, MA',
+  // Colorado
+  '80201':'Denver, CO','80202':'Denver, CO','80203':'Denver, CO','80204':'Denver, CO',
+  // Nevada
+  '89101':'Las Vegas, NV','89102':'Las Vegas, NV','89103':'Las Vegas, NV',
+  // North Carolina
+  '27601':'Raleigh, NC','27602':'Raleigh, NC','27603':'Raleigh, NC',
+  '28201':'Charlotte, NC','28202':'Charlotte, NC','28203':'Charlotte, NC',
+};
+
+/* Provider data — keyed by state abbreviation */
+const PROVIDERS = [
+  { name:'Sunrise Home Care',        type:'Home Care Agency',       city:'Austin',        state:'TX', rating:4.9, reviews:134, badge:true,  specialties:['Home Care','Memory Care','Respite Care'] },
+  { name:'Caring Hands Agency',      type:'Home Care Agency',       city:'Austin',        state:'TX', rating:4.7, reviews:89,  badge:true,  specialties:['Home Care','Daily Living Assistance'] },
+  { name:'Austin Elder Law Group',   type:'Elder Law Attorney',     city:'Austin',        state:'TX', rating:4.8, reviews:201, badge:true,  specialties:['Elder Law','Estate Planning','Medicaid'] },
+  { name:'Central Texas Memory Care',type:'Memory Care Facility',   city:'Austin',        state:'TX', rating:4.6, reviews:57,  badge:false, specialties:['Memory Care','Dementia Care'] },
+  { name:'Lone Star Care Management',type:'Care Manager',           city:'Austin',        state:'TX', rating:4.8, reviews:112, badge:true,  specialties:['Care Management','Hospital Discharge'] },
+  { name:'HoustonCare Home Services',type:'Home Care Agency',       city:'Houston',       state:'TX', rating:4.7, reviews:98,  badge:true,  specialties:['Home Care','Personal Care','Companionship'] },
+  { name:'Gulf Coast Elder Law',     type:'Elder Law Attorney',     city:'Houston',       state:'TX', rating:4.9, reviews:176, badge:true,  specialties:['Elder Law','Guardianship','Veterans Benefits'] },
+  { name:'Dallas Senior Living',     type:'Assisted Living',        city:'Dallas',        state:'TX', rating:4.5, reviews:63,  badge:true,  specialties:['Assisted Living','Memory Care'] },
+  { name:'Metroplex Care Partners',  type:'Care Manager',           city:'Dallas',        state:'TX', rating:4.8, reviews:88,  badge:true,  specialties:['Care Management','Geriatric Care'] },
+  { name:'SA Home Health Pros',      type:'Home Care Agency',       city:'San Antonio',   state:'TX', rating:4.6, reviews:74,  badge:false, specialties:['Home Care','Skilled Nursing','Physical Therapy'] },
+  { name:'Manhattan Elder Care',     type:'Home Care Agency',       city:'New York',      state:'NY', rating:4.8, reviews:312, badge:true,  specialties:['Home Care','24-Hour Care','Alzheimers Care'] },
+  { name:'NYC Elder Law Associates', type:'Elder Law Attorney',     city:'New York',      state:'NY', rating:4.9, reviews:445, badge:true,  specialties:['Elder Law','Medicaid Planning','Trusts'] },
+  { name:'Brooklyn Senior Services', type:'Care Manager',           city:'Brooklyn',      state:'NY', rating:4.7, reviews:143, badge:true,  specialties:['Care Management','Benefits Navigation'] },
+  { name:'Queens Home Companions',   type:'Home Care Agency',       city:'Queens',        state:'NY', rating:4.6, reviews:91,  badge:false, specialties:['Home Care','Companion Care'] },
+  { name:'LA Senior Care Network',   type:'Care Manager',           city:'Los Angeles',   state:'CA', rating:4.8, reviews:267, badge:true,  specialties:['Care Management','Geriatric Assessment'] },
+  { name:'Pacific Elder Law',        type:'Elder Law Attorney',     city:'Los Angeles',   state:'CA', rating:4.9, reviews:389, badge:true,  specialties:['Elder Law','Medi-Cal Planning','Conservatorship'] },
+  { name:'Bay Area Elder Advocates', type:'Elder Law Attorney',     city:'San Francisco', state:'CA', rating:4.9, reviews:201, badge:true,  specialties:['Elder Law','Medi-Cal','Special Needs Trusts'] },
+  { name:'SF Home Care Collective',  type:'Home Care Agency',       city:'San Francisco', state:'CA', rating:4.7, reviews:118, badge:true,  specialties:['Home Care','Memory Care','Hospice Support'] },
+  { name:'San Diego Senior Helpers', type:'Home Care Agency',       city:'San Diego',     state:'CA', rating:4.6, reviews:83,  badge:true,  specialties:['Home Care','Alzheimers Care','Parkinson\'s Care'] },
+  { name:'Chicago Elder Law Firm',   type:'Elder Law Attorney',     city:'Chicago',       state:'IL', rating:4.8, reviews:234, badge:true,  specialties:['Elder Law','Medicaid Planning','Asset Protection'] },
+  { name:'Windy City Home Care',     type:'Home Care Agency',       city:'Chicago',       state:'IL', rating:4.7, reviews:156, badge:true,  specialties:['Home Care','Overnight Care','Dementia Care'] },
+  { name:'Miami Senior Advisors',    type:'Care Manager',           city:'Miami',         state:'FL', rating:4.8, reviews:147, badge:true,  specialties:['Care Management','Facility Placement'] },
+  { name:'South Florida Elder Law',  type:'Elder Law Attorney',     city:'Miami',         state:'FL', rating:4.9, reviews:298, badge:true,  specialties:['Elder Law','Medicaid','Probate'] },
+  { name:'Orlando Care Solutions',   type:'Home Care Agency',       city:'Orlando',       state:'FL', rating:4.6, reviews:79,  badge:false, specialties:['Home Care','Respite Care'] },
+  { name:'Tampa Bay Senior Living',  type:'Assisted Living',        city:'Tampa',         state:'FL', rating:4.7, reviews:92,  badge:true,  specialties:['Assisted Living','Memory Care','Respite Stays'] },
+  { name:'Peachtree Elder Law',      type:'Elder Law Attorney',     city:'Atlanta',       state:'GA', rating:4.8, reviews:188, badge:true,  specialties:['Elder Law','Medicaid Planning','Wills & Trusts'] },
+  { name:'Atlanta Senior Care Group',type:'Care Manager',           city:'Atlanta',       state:'GA', rating:4.7, reviews:104, badge:true,  specialties:['Care Management','Crisis Intervention'] },
+  { name:'Desert Sun Senior Care',   type:'Home Care Agency',       city:'Phoenix',       state:'AZ', rating:4.6, reviews:88,  badge:true,  specialties:['Home Care','24-Hour Care'] },
+  { name:'Philly Elder Law Center',  type:'Elder Law Attorney',     city:'Philadelphia',  state:'PA', rating:4.8, reviews:212, badge:true,  specialties:['Elder Law','Medicaid','Guardianship'] },
+  { name:'Seattle Senior Solutions', type:'Care Manager',           city:'Seattle',       state:'WA', rating:4.9, reviews:134, badge:true,  specialties:['Care Management','Discharge Planning'] },
+  { name:'Pacific NW Home Care',     type:'Home Care Agency',       city:'Seattle',       state:'WA', rating:4.7, reviews:97,  badge:true,  specialties:['Home Care','Memory Care'] },
+  { name:'Boston Elder Advocates',   type:'Elder Law Attorney',     city:'Boston',        state:'MA', rating:4.9, reviews:276, badge:true,  specialties:['Elder Law','MassHealth Planning','Trusts'] },
+  { name:'Mile High Senior Care',    type:'Home Care Agency',       city:'Denver',        state:'CO', rating:4.6, reviews:71,  badge:false, specialties:['Home Care','Companion Care','Personal Care'] },
+  { name:'Vegas Valley Elder Law',   type:'Elder Law Attorney',     city:'Las Vegas',     state:'NV', rating:4.7, reviews:143, badge:true,  specialties:['Elder Law','Medicaid','Estate Planning'] },
+  { name:'Triangle Senior Services', type:'Care Manager',           city:'Raleigh',       state:'NC', rating:4.8, reviews:89,  badge:true,  specialties:['Care Management','Geriatric Care'] },
+  { name:'Queen City Elder Care',    type:'Home Care Agency',       city:'Charlotte',     state:'NC', rating:4.6, reviews:67,  badge:false, specialties:['Home Care','Dementia Care'] },
+];
+
+const TYPE_ICONS = {
+  'Home Care Agency':     '🏠',
+  'Elder Law Attorney':   '⚖️',
+  'Care Manager':         '📋',
+  'Memory Care Facility': '🧠',
+  'Assisted Living':      '🏡',
+  'Hospice Provider':     '🤝',
+};
+
 function handleSearch() {
   const input = document.getElementById('zip-input');
   const error = document.getElementById('search-error');
@@ -45,8 +140,66 @@ function handleSearch() {
     return;
   }
 
-  showToast(`🔍 Searching for providers near ${zip}…`);
-  setTimeout(() => showToast(`✅ Matched! Providers near ${zip} have been notified.`), 1900);
+  const cityState = ZIP_CITIES[zip] || null;
+  const resultsSection = document.getElementById('search-results');
+  const grid           = document.getElementById('provider-results-grid');
+  const eyebrow        = document.getElementById('results-eyebrow');
+  const title          = document.getElementById('results-title');
+  const subtitle       = document.getElementById('results-subtitle');
+
+  if (!resultsSection || !grid) return;
+
+  // Show loading state
+  showToast('🔍 Searching for providers near ' + zip + '…');
+
+  setTimeout(() => {
+    let matched = [];
+
+    if (cityState) {
+      const [city, state] = cityState.split(', ');
+      // First try city match, then fall back to state match
+      matched = PROVIDERS.filter(p => p.city === city && p.state === state);
+      if (matched.length === 0) matched = PROVIDERS.filter(p => p.state === state);
+    }
+
+    // If still nothing, show nationwide sample
+    if (matched.length === 0) {
+      matched = PROVIDERS.filter(p => p.badge).slice(0, 4);
+    }
+
+    // Cap at 4 results
+    matched = matched.slice(0, 4);
+
+    const locationLabel = cityState || 'your area';
+
+    eyebrow.textContent  = `ZIP ${zip} · ${locationLabel}`;
+    title.textContent    = `${matched.length} Verified Providers Found`;
+    subtitle.textContent = `These providers cover ${locationLabel} and are accepting new clients.`;
+
+    grid.innerHTML = matched.map(p => `
+      <div class="card" style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+          <div>
+            <p style="font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:3px;">${p.name}</p>
+            <p style="font-size:.8rem; color:var(--gray-500);">${TYPE_ICONS[p.type] || '📍'} ${p.type} · ${p.city}, ${p.state}</p>
+          </div>
+          ${p.badge ? '<span style="background:#dcfce7;color:#15803d;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;">✓ ECM Verified</span>' : ''}
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#f59e0b; font-size:.9rem;">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5 - Math.round(p.rating))}</span>
+          <span style="font-size:.8rem; color:var(--gray-500);">${p.rating} (${p.reviews} reviews)</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          ${p.specialties.map(s => `<span style="background:var(--blue-50);color:var(--blue-700);font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:20px;">${s}</span>`).join('')}
+        </div>
+        <button class="btn btn--primary btn--sm" style="margin-top:4px;" onclick="showToast('Request sent to ${p.name}! They will contact you shortly.')">Request a Match →</button>
+      </div>
+    `).join('');
+
+    resultsSection.style.display = 'block';
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('✅ ' + matched.length + ' providers found near ' + zip);
+  }, 800);
 }
 
 /* Allow pressing Enter in the ZIP input */
