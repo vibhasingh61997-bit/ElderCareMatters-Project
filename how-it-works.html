@@ -6,21 +6,32 @@
   <title>How It Works — ElderCareMatters</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .step-detail { display:flex; gap:20px; align-items:flex-start; padding:28px 0; border-bottom:1px solid var(--gray-200); }
-    .step-detail:last-child { border-bottom:none; }
-    .step-detail__num { width:48px; height:48px; border-radius:50%; background:var(--blue-700); color:#fff; font-size:1.2rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .step-detail__title { font-size:1.05rem; font-weight:700; color:var(--gray-900); margin-bottom:6px; }
-    .step-detail__body  { font-size:.9rem; color:var(--gray-500); line-height:1.7; }
-    .trust-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:16px; }
-    .trust-item { display:flex; align-items:flex-start; gap:10px; font-size:.875rem; color:var(--gray-700); }
-    .trust-item__icon { font-size:1.1rem; margin-top:2px; }
+    .hiw-step { display:grid; grid-template-columns:56px 1fr; gap:24px; align-items:flex-start; padding:40px 0; border-bottom:1px solid var(--gray-200); }
+    .hiw-step:last-child { border-bottom:none; }
+    .hiw-step__num { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--blue-600),#1e40af); color:var(--white); font-size:1.1rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:var(--shadow-blue); }
+    .hiw-step__label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--blue-600); margin-bottom:6px; }
+    .hiw-step__title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--navy); margin-bottom:12px; }
+    .hiw-step__desc { font-size:.95rem; color:var(--gray-600); line-height:1.8; max-width:580px; }
+    .hiw-step__pills { margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; }
+    .hiw-step__pill { background:var(--blue-50); border:1px solid var(--blue-100); border-radius:var(--radius-full); padding:5px 13px; font-size:.78rem; font-weight:600; color:var(--blue-700); }
+    .guarantee-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+    .guarantee-item { text-align:center; padding:32px 24px; background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); transition:all var(--transition); }
+    .guarantee-item:hover { box-shadow:var(--shadow-md); transform:translateY(-3px); border-color:var(--blue-100); }
+    .guarantee-item__icon { font-size:2.2rem; margin-bottom:14px; }
+    .guarantee-item__title { font-weight:700; color:var(--navy); margin-bottom:8px; }
+    .guarantee-item__desc { font-size:.85rem; color:var(--gray-500); line-height:1.65; }
+    .faq-item { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:22px 26px; margin-bottom:10px; cursor:pointer; transition:all var(--transition); }
+    .faq-item:hover { border-color:var(--blue-100); box-shadow:var(--shadow-sm); }
+    .faq-item__q { font-weight:700; color:var(--navy); font-size:.95rem; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .faq-item__a { font-size:.875rem; color:var(--gray-600); line-height:1.75; margin-top:12px; display:none; }
+    .faq-item.open .faq-item__a { display:block; }
+    .faq-chevron { transition:transform var(--transition); font-size:.75rem; color:var(--gray-400); flex-shrink:0; }
+    .faq-item.open .faq-chevron { transform:rotate(180deg); }
   </style>
 </head>
 <body>
 
-  <span class="wf-label">Screen 2 · How It Works</span>
-
-  <header class="header">
+  <header class="header" id="site-header">
     <div class="container header__inner">
       <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
       <nav class="header__nav">
@@ -32,104 +43,171 @@
     </div>
   </header>
 
-  <!-- Page hero -->
-  <section class="hero" style="padding:56px 0 48px;">
-    <div class="container">
-      <p class="hero__eyebrow">For Families</p>
-      <h1 class="hero__title" style="font-size:clamp(1.8rem,4vw,2.5rem);">How ElderCareMatters Works</h1>
-      <p class="hero__subtitle">A guided, transparent process — always free for families.</p>
+  <!-- Hero -->
+  <section class="hero" style="padding:72px 0 64px; text-align:center;">
+    <div class="container" style="max-width:680px;">
+      <div class="hero__eyebrow" style="justify-content:center; margin:0 auto 22px;">
+        <span class="hero__eyebrow-dot"></span>
+        For Families · Always Free
+      </div>
+      <h1 class="hero__title" style="font-size:clamp(2rem,4vw,2.8rem);">
+        How <em>ElderCareMatters</em> Works
+      </h1>
+      <p class="hero__subtitle" style="margin:0 auto 32px;">
+        A guided, transparent process from your first question to your first provider conversation — in under 2 minutes.
+      </p>
+      <a href="index.html#chatbot-section" class="btn btn--primary btn--lg">Start Free Match →</a>
     </div>
   </section>
 
-  <!-- Step-by-step detail -->
+  <!-- Trust bar -->
+  <div class="trust-bar">
+    <div class="container trust-bar__inner">
+      <div class="trust-stat"><span class="trust-stat__num">Free</span><span>always for families</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">2 min</span><span>to complete intake</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">48 hr</span><span>avg. first response</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">500+</span><span>verified providers</span></div>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <section class="section section--white">
+    <div class="container" style="max-width:760px;">
+      <div class="section__header" style="margin-bottom:8px;">
+        <p class="section__eyebrow">Step by Step</p>
+        <h2 class="section__title">The Full Process</h2>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step__num">1</div>
+        <div>
+          <p class="hiw-step__label">Intake</p>
+          <h3 class="hiw-step__title">Describe the care need</h3>
+          <p class="hiw-step__desc">Use our guided intake — a short chat or form. Tell us who needs care, what type of service, where they are located (ZIP code), how urgent it is, and your budget range.</p>
+          <div class="hiw-step__pills">
+            <span class="hiw-step__pill">Who needs care?</span>
+            <span class="hiw-step__pill">What type of service?</span>
+            <span class="hiw-step__pill">ZIP code</span>
+            <span class="hiw-step__pill">Urgency & budget</span>
+          </div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step__num">2</div>
+        <div>
+          <p class="hiw-step__label">Scoring</p>
+          <h3 class="hiw-step__title">We score & match your request</h3>
+          <p class="hiw-step__desc">Your submission becomes a <strong>lead</strong>. Our system automatically scores it for data quality and conversion intent, then finds verified providers in your exact area who cover your ZIP code and service type.</p>
+          <div class="hiw-step__pills">
+            <span class="hiw-step__pill">Lead Quality Score (LQS)</span>
+            <span class="hiw-step__pill">Lead Intent Score (LIS)</span>
+            <span class="hiw-step__pill">Geo-matched by ZIP → city</span>
+          </div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step__num">3</div>
+        <div>
+          <p class="hiw-step__label">Matching</p>
+          <h3 class="hiw-step__title">Providers are notified</h3>
+          <p class="hiw-step__desc">Verified providers in your area see your request in their Lead Marketplace. They review your care type, location, and scores — then choose to purchase the lead to unlock your contact details. Max 3 providers per request.</p>
+          <div class="hiw-step__pills">
+            <span class="hiw-step__pill">Max 3 providers per lead</span>
+            <span class="hiw-step__pill">ECM Verified only</span>
+            <span class="hiw-step__pill">Geo-matched coverage</span>
+          </div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step__num">4</div>
+        <div>
+          <p class="hiw-step__label">Connection</p>
+          <h3 class="hiw-step__title">Providers reach out to you</h3>
+          <p class="hiw-step__desc">Matched providers contact you through the ECM platform. You receive messages in your consumer dashboard and by email. You choose who to respond to — there is no obligation to work with any provider.</p>
+          <div class="hiw-step__pills">
+            <span class="hiw-step__pill">Platform-mediated messaging</span>
+            <span class="hiw-step__pill">Email notifications</span>
+            <span class="hiw-step__pill">No obligation</span>
+          </div>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step__num">5</div>
+        <div>
+          <p class="hiw-step__label">Decision</p>
+          <h3 class="hiw-step__title">You choose the right fit</h3>
+          <p class="hiw-step__desc">Review provider profiles, credentials, and ratings. Reply to messages, ask questions, and make the decision that's right for your family — entirely on your own timeline.</p>
+          <div class="hiw-step__pills">
+            <span class="hiw-step__pill">View provider profiles</span>
+            <span class="hiw-step__pill">Read verified reviews</span>
+            <span class="hiw-step__pill">Decide on your terms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Guarantees -->
+  <section class="section section--cream">
+    <div class="container">
+      <div class="section__header">
+        <p class="section__eyebrow">Our Promise</p>
+        <h2 class="section__title">What We Guarantee Families</h2>
+        <p class="section__subtitle">ElderCareMatters is built on trust. Here is what you can always expect.</p>
+      </div>
+      <div class="guarantee-grid">
+        <div class="guarantee-item">
+          <div class="guarantee-item__icon">💚</div>
+          <h3 class="guarantee-item__title">Always Free for Families</h3>
+          <p class="guarantee-item__desc">No cost, subscription, or hidden fee — ever. Providers pay, you don't.</p>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-item__icon">🔒</div>
+          <h3 class="guarantee-item__title">Your Info Stays Private</h3>
+          <p class="guarantee-item__desc">Your contact details are only shared with providers who purchase your lead. We never sell your data.</p>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-item__icon">✅</div>
+          <h3 class="guarantee-item__title">Pre-Screened Providers</h3>
+          <p class="guarantee-item__desc">Every provider has been reviewed for legitimacy before being listed. ECM Verified means their credentials check out.</p>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-item__icon">🚫</div>
+          <h3 class="guarantee-item__title">No Spam, Ever</h3>
+          <p class="guarantee-item__desc">Providers contact you through our platform only. No cold calls or unsolicited emails. You stay in control.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
   <section class="section section--white">
     <div class="container" style="max-width:720px;">
-
-      <div class="step-detail">
-        <div class="step-detail__num">1</div>
-        <div>
-          <p class="step-detail__title">You describe the care need</p>
-          <p class="step-detail__body">
-            Use our guided intake — a short chat or form. You tell us who needs care, what type of service,
-            where they are located (ZIP code), how urgent it is, and your budget range.
-            Takes under 2 minutes.
-          </p>
-        </div>
+      <div class="section__header">
+        <p class="section__eyebrow">FAQ</p>
+        <h2 class="section__title">Frequently Asked Questions</h2>
       </div>
-
-      <div class="step-detail">
-        <div class="step-detail__num">2</div>
-        <div>
-          <p class="step-detail__title">We score and match your request</p>
-          <p class="step-detail__body">
-            Your submission becomes a <strong>lead</strong>. Our system automatically scores it for
-            data quality and conversion intent, then finds providers in your area who cover your
-            ZIP code and service type. Geography is the primary matching layer.
-          </p>
-        </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-item__q">How long does it take to get matched? <span class="faq-chevron">▼</span></div>
+        <div class="faq-item__a">Most families receive their first provider response within 24–48 hours. Urgent requests are typically responded to faster.</div>
       </div>
-
-      <div class="step-detail">
-        <div class="step-detail__num">3</div>
-        <div>
-          <p class="step-detail__title">Providers are notified</p>
-          <p class="step-detail__body">
-            Verified providers in your area see your request — your care type, city, urgency,
-            and budget range — before deciding to respond. Your full contact info stays hidden
-            until a provider purchases your lead.
-          </p>
-        </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-item__q">Is this really free for families? <span class="faq-chevron">▼</span></div>
+        <div class="faq-item__a">Yes — completely free. Providers pay a subscription and per-lead fee. There is no cost or credit card required from families at any stage.</div>
       </div>
-
-      <div class="step-detail">
-        <div class="step-detail__num">4</div>
-        <div>
-          <p class="step-detail__title">Providers reach out through the platform</p>
-          <p class="step-detail__body">
-            Providers who match your needs send a message through ElderCareMatters.
-            You receive it in your consumer dashboard and via email. Your personal contact
-            info stays protected until you choose to share it directly.
-          </p>
-        </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-item__q">How many providers will contact me? <span class="faq-chevron">▼</span></div>
+        <div class="faq-item__a">A maximum of 3 providers can purchase any single lead. You get meaningful outreach without being overwhelmed.</div>
       </div>
-
-      <div class="step-detail">
-        <div class="step-detail__num">5</div>
-        <div>
-          <p class="step-detail__title">You choose who to work with</p>
-          <p class="step-detail__body">
-            You are never obligated to work with anyone. Review provider profiles, credentials,
-            and messages. Then connect directly with the one that feels right for your family.
-          </p>
-        </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-item__q">What does "ECM Verified" mean? <span class="faq-chevron">▼</span></div>
+        <div class="faq-item__a">ECM Verified means our team has reviewed the provider's business licence and credentials before they are listed on the platform. It is a baseline trust signal.</div>
       </div>
-
-    </div>
-  </section>
-
-  <!-- Trust section -->
-  <section class="section section--gray">
-    <div class="container" style="max-width:800px;">
-      <p class="section__eyebrow">Module K — Trust Framework</p>
-      <h2 class="section__title">Why Families Trust ElderCareMatters</h2>
-      <p class="section__subtitle">Every provider on the platform goes through our verification process.</p>
-      <div class="trust-row">
-        <div class="trust-item">
-          <span class="trust-item__icon">✅</span>
-          <div><strong>ECM Verified Badge</strong><br>Business legitimacy checked before listing.</div>
-        </div>
-        <div class="trust-item">
-          <span class="trust-item__icon">🏅</span>
-          <div><strong>Credential Display</strong><br>Licenses and certifications shown as claimed or verified.</div>
-        </div>
-        <div class="trust-item">
-          <span class="trust-item__icon">💬</span>
-          <div><strong>Platform Messaging</strong><br>Providers contact you through ECM — no cold calls.</div>
-        </div>
-        <div class="trust-item">
-          <span class="trust-item__icon">🔒</span>
-          <div><strong>Data Protection</strong><br>Your contact info is never sold or shared without consent.</div>
-        </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-item__q">What types of providers are on the platform? <span class="faq-chevron">▼</span></div>
+        <div class="faq-item__a">Home care agencies, assisted living facilities, memory care facilities, elder law attorneys, geriatric care managers, and hospice providers.</div>
       </div>
     </div>
   </section>
@@ -138,28 +216,35 @@
   <section class="cta-banner">
     <div class="container cta-banner__inner">
       <div>
-        <h2 class="cta-banner__title">Ready to find care?</h2>
-        <p class="cta-banner__subtitle">Start your free match — takes less than 2 minutes.</p>
+        <h2 class="cta-banner__title">Ready to find the right care?</h2>
+        <p class="cta-banner__subtitle">Start your free match now — takes under 2 minutes, no cost, no commitment.</p>
       </div>
-      <a href="index.html#chatbot" class="btn btn--white btn--lg">Get My Free Match →</a>
+      <a href="index.html#chatbot-section" class="btn btn--white btn--lg">Start Free Match →</a>
     </div>
   </section>
 
   <footer class="footer">
-    <div class="container footer__inner">
-      <p class="footer__brand">ElderCareMatters</p>
-      <div class="footer__links">
-        <a href="how-it-works.html">How It Works</a>
-        <a href="index.html#services">Services</a>
-        <a href="for-providers.html">For Providers</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <p class="footer__brand">ElderCareMatters</p>
+          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;"><span class="footer__badge">✓ Verified Providers</span><span class="footer__badge">🔒 Privacy Protected</span></div>
+        </div>
+        <div><p class="footer__col-title">For Families</p><div class="footer__col-links"><a href="how-it-works.html">How It Works</a><a href="index.html#services">Browse Services</a><a href="consumer-dashboard.html">My Care Request</a></div></div>
+        <div><p class="footer__col-title">For Providers</p><div class="footer__col-links"><a href="for-providers.html">Provider Overview</a><a href="for-providers.html#pricing">Pricing & Plans</a><a href="provider-dashboard.html">Provider Login</a></div></div>
+        <div><p class="footer__col-title">Company</p><div class="footer__col-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Privacy Policy</a></div></div>
       </div>
-      <p class="footer__copy">© 2026 ElderCareMatters. All rights reserved.</p>
+      <div class="footer__bottom"><p>© 2026 ElderCareMatters. All rights reserved.</p><p>Free for families · Verified providers · No spam</p></div>
     </div>
   </footer>
 
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
+    });
+  </script>
 </body>
 </html>
