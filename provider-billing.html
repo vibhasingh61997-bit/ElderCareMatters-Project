@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billing — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .billing-card { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius-lg); padding:24px; margin-bottom:20px; }
+    .billing-card__title { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-500); margin-bottom:12px; }
+    .plan-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .plan-badge { background:var(--blue-50); color:var(--blue-700); font-weight:700; font-size:.85rem; padding:4px 12px; border-radius:20px; }
+    .invoice-table { width:100%; border-collapse:collapse; font-size:.875rem; }
+    .invoice-table th { text-align:left; padding:10px 12px; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-500); border-bottom:1.5px solid var(--gray-200); }
+    .invoice-table td { padding:12px 12px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+    .invoice-table tr:last-child td { border-bottom:none; }
+    .status-paid { color:#16a34a; font-weight:600; font-size:.8rem; }
+    .credit-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; }
+    .credit-box { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:var(--radius); padding:16px 20px; text-align:center; }
+    .credit-box__num { font-size:1.5rem; font-weight:800; color:var(--navy); }
+    .credit-box__label { font-size:.78rem; color:var(--gray-500); margin-top:2px; }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">Billing</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <span style="font-size:.8rem; color:var(--gray-500);">Sunrise Home Care &nbsp;·&nbsp;</span>
+        <a href="index.html" class="btn btn--ghost btn--sm">← Public Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="dash-layout">
+    <aside class="dash-sidebar">
+      <div class="dash-sidebar__logo">ECM Provider</div>
+      <a href="provider-dashboard.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📊</span> Dashboard</a>
+      <a href="provider-leads.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📥</span> Lead Inbox</a>
+      <a href="provider-billing.html" class="dash-sidebar__item active"><span class="dash-sidebar__icon">💳</span> Billing</a>
+      <a href="provider-profile.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">👤</span> My Profile</a>
+      <a href="provider-settings.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">⚙️</span> Settings</a>
+    </aside>
+
+    <main class="dash-main">
+      <div class="dash-main__header">
+        <div>
+          <h1 class="dash-main__title">Billing</h1>
+          <p class="dash-main__subtitle">Manage your subscription and lead credits.</p>
+        </div>
+      </div>
+
+      <!-- Current Plan -->
+      <div class="billing-card">
+        <p class="billing-card__title">Current Plan</p>
+        <div class="plan-row">
+          <div>
+            <span class="plan-badge">Professional</span>
+            <p style="font-size:.875rem; color:var(--gray-500); margin-top:8px;">$299/month · Renews May 8, 2026 · City + radius coverage</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <a href="#" class="btn btn--ghost btn--sm">Change Plan</a>
+            <a href="#" class="btn btn--secondary btn--sm">Cancel Subscription</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lead Credits -->
+      <div class="billing-card">
+        <p class="billing-card__title">Lead Credit Balance</p>
+        <div class="credit-row" style="margin-bottom:20px;">
+          <div class="credit-box">
+            <div class="credit-box__num">8</div>
+            <div class="credit-box__label">Credits remaining</div>
+          </div>
+          <div class="credit-box">
+            <div class="credit-box__num">12</div>
+            <div class="credit-box__label">Used this month</div>
+          </div>
+          <div class="credit-box">
+            <div class="credit-box__num">20</div>
+            <div class="credit-box__label">Monthly allowance</div>
+          </div>
+        </div>
+        <p style="font-size:.8rem; color:var(--gray-500); margin-bottom:14px;">Need more leads? Top up with additional credits.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn--ghost btn--sm" onclick="showToast('5 credits added!')">+ 5 credits — $75</button>
+          <button class="btn btn--ghost btn--sm" onclick="showToast('10 credits added!')">+ 10 credits — $130</button>
+          <button class="btn btn--ghost btn--sm" onclick="showToast('25 credits added!')">+ 25 credits — $275</button>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="billing-card">
+        <p class="billing-card__title">Payment Method</p>
+        <div class="plan-row">
+          <p style="font-size:.875rem; color:var(--gray-700);">💳 &nbsp;Visa ending in 4242 &nbsp;·&nbsp; Expires 09/27</p>
+          <a href="#" class="btn btn--ghost btn--sm">Update Card</a>
+        </div>
+      </div>
+
+      <!-- Invoice History -->
+      <div class="billing-card">
+        <p class="billing-card__title">Invoice History</p>
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Apr 8, 2026</td>
+              <td>Professional Plan — April</td>
+              <td>$299.00</td>
+              <td><span class="status-paid">Paid</span></td>
+              <td><a href="#" style="font-size:.8rem; color:var(--blue-700);">Download</a></td>
+            </tr>
+            <tr>
+              <td>Apr 2, 2026</td>
+              <td>Lead credits — 10 pack</td>
+              <td>$130.00</td>
+              <td><span class="status-paid">Paid</span></td>
+              <td><a href="#" style="font-size:.8rem; color:var(--blue-700);">Download</a></td>
+            </tr>
+            <tr>
+              <td>Mar 8, 2026</td>
+              <td>Professional Plan — March</td>
+              <td>$299.00</td>
+              <td><span class="status-paid">Paid</span></td>
+              <td><a href="#" style="font-size:.8rem; color:var(--blue-700);">Download</a></td>
+            </tr>
+            <tr>
+              <td>Feb 8, 2026</td>
+              <td>Professional Plan — February</td>
+              <td>$299.00</td>
+              <td><span class="status-paid">Paid</span></td>
+              <td><a href="#" style="font-size:.8rem; color:var(--blue-700);">Download</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
