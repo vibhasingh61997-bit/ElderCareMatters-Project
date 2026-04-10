@@ -9,164 +9,182 @@
   <style>
     /* ── Location bar ── */
     .location-bar {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
-      border-radius: var(--radius-full); padding: 6px 14px;
-      font-size: .82rem; color: var(--white); margin-bottom: 20px;
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
+      border-radius:var(--radius-full); padding:6px 14px;
+      font-size:.82rem; color:var(--white); margin-bottom:20px;
     }
-    .location-bar__dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink:0; }
-    .location-bar__change {
-      background: none; border: none; color: rgba(255,255,255,.65);
-      font-size: .78rem; cursor: pointer; text-decoration: underline;
-      padding: 0; font-family: inherit;
-    }
-    .location-bar__change:hover { color: var(--white); }
+    .location-bar__dot { width:8px; height:8px; background:#4ade80; border-radius:50%; flex-shrink:0; animation:pulse 2s infinite; }
+    .location-bar__change { background:none; border:none; color:rgba(255,255,255,.65); font-size:.78rem; cursor:pointer; text-decoration:underline; padding:0; font-family:inherit; }
+    .location-bar__change:hover { color:var(--white); }
 
-    /* ── New search bar v2 ── */
+    /* ── Search bar v2 ── */
     .search-v2 {
-      display: flex; align-items: stretch; gap: 0;
-      background: var(--white); border-radius: var(--radius-lg);
-      box-shadow: 0 8px 32px rgba(0,0,0,.18); overflow: hidden;
-      max-width: 560px;
+      display:flex; align-items:stretch; gap:0;
+      background:var(--white); border-radius:var(--radius-lg);
+      box-shadow:0 8px 32px rgba(0,0,0,.18); overflow:hidden; max-width:520px;
     }
     .search-v2__select {
-      flex: 1; border: none; outline: none; padding: 16px 18px;
-      font-size: .95rem; font-family: inherit; color: var(--navy);
-      background: var(--white); cursor: pointer;
-      appearance: none; -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center;
-      padding-right: 36px;
+      flex:1; border:none; outline:none; padding:16px 18px;
+      font-size:.95rem; font-family:inherit; color:var(--navy); background:var(--white);
+      cursor:pointer; appearance:none; -webkit-appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
     }
-    .search-v2__select:focus { background-color: #f0f9ff; }
-    .search-v2__divider { width: 1px; background: var(--gray-200); flex-shrink: 0; }
+    .search-v2__select:focus { background-color:#f0f9ff; }
+    .search-v2__divider { width:1px; background:var(--gray-200); flex-shrink:0; }
     .search-v2__btn {
-      background: linear-gradient(135deg, var(--blue-600), #1e40af);
-      color: var(--white); border: none; padding: 16px 26px;
-      font-size: .95rem; font-weight: 700; cursor: pointer;
-      font-family: inherit; white-space: nowrap; transition: opacity .15s;
+      background:linear-gradient(135deg,var(--blue-600),#1e40af);
+      color:var(--white); border:none; padding:16px 26px;
+      font-size:.95rem; font-weight:700; cursor:pointer; font-family:inherit;
+      white-space:nowrap; transition:opacity .15s;
     }
-    .search-v2__btn:hover { opacity: .92; }
+    .search-v2__btn:hover { opacity:.92; }
 
     /* ── Location modal ── */
     .loc-modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.45);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1000; opacity: 0; pointer-events: none;
-      transition: opacity .2s;
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      display:flex; align-items:center; justify-content:center;
+      z-index:1000; opacity:0; pointer-events:none; transition:opacity .2s;
     }
-    .loc-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .loc-modal-overlay.open { opacity:1; pointer-events:all; }
     .loc-modal {
-      background: var(--white); border-radius: var(--radius-lg);
-      padding: 32px; width: 90%; max-width: 420px;
-      box-shadow: var(--shadow-xl, 0 25px 60px rgba(0,0,0,.2));
-      transform: translateY(12px); transition: transform .2s;
+      background:var(--white); border-radius:var(--radius-lg); padding:32px;
+      width:90%; max-width:420px; box-shadow:0 25px 60px rgba(0,0,0,.2);
+      transform:translateY(12px); transition:transform .2s;
     }
-    .loc-modal-overlay.open .loc-modal { transform: translateY(0); }
-    .loc-modal__title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 6px; }
-    .loc-modal__sub { font-size: .83rem; color: var(--gray-500); margin-bottom: 22px; }
-    .loc-modal__input {
-      width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius); font-size: .9rem; font-family: inherit;
-      outline: none; box-sizing: border-box; margin-bottom: 10px;
-    }
-    .loc-modal__input:focus { border-color: var(--blue-600); }
-    .loc-modal__or { text-align: center; color: var(--gray-400); font-size: .78rem; margin: 10px 0; }
-    .loc-modal__state { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); font-size: .9rem; font-family: inherit; outline: none; box-sizing: border-box; margin-bottom: 16px; }
-    .loc-modal__state:focus { border-color: var(--blue-600); }
-    .loc-modal__actions { display: flex; gap: 10px; }
-    .loc-modal__cancel { background: none; border: 1.5px solid var(--gray-200); border-radius: var(--radius); padding: 10px 18px; font-size: .875rem; cursor: pointer; font-family: inherit; color: var(--gray-600); }
-    .loc-modal__cancel:hover { border-color: var(--gray-400); }
+    .loc-modal-overlay.open .loc-modal { transform:translateY(0); }
+    .loc-modal__title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--navy); margin-bottom:6px; }
+    .loc-modal__sub { font-size:.83rem; color:var(--gray-500); margin-bottom:20px; }
+    .loc-modal__input { width:100%; padding:12px 16px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.9rem; font-family:inherit; outline:none; box-sizing:border-box; margin-bottom:10px; }
+    .loc-modal__input:focus { border-color:var(--blue-600); }
+    .loc-modal__or { text-align:center; color:var(--gray-400); font-size:.78rem; margin:10px 0; }
+    .loc-modal__state { width:100%; padding:11px 14px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.9rem; font-family:inherit; outline:none; box-sizing:border-box; margin-bottom:16px; }
+    .loc-modal__state:focus { border-color:var(--blue-600); }
+    .loc-modal__actions { display:flex; gap:10px; }
+    .loc-modal__cancel { background:none; border:1.5px solid var(--gray-200); border-radius:var(--radius); padding:10px 18px; font-size:.875rem; cursor:pointer; font-family:inherit; color:var(--gray-600); }
 
     /* ── Results filter bar ── */
-    .results-filter-bar {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-      margin-bottom: 20px; padding-bottom: 16px;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .results-filter-bar label { font-size: .82rem; font-weight: 600; color: var(--gray-600); }
-    .results-filter-select {
-      padding: 7px 28px 7px 12px; border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-full); font-size: .82rem; font-family: inherit;
-      color: var(--navy); outline: none; cursor: pointer;
-      background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;
-      appearance: none; -webkit-appearance: none;
-    }
-    .results-filter-select:focus { border-color: var(--blue-600); }
-    .results-count-tag { margin-left: auto; font-size: .8rem; color: var(--gray-500); }
+    .results-filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--gray-100); }
+    .results-filter-bar label { font-size:.82rem; font-weight:600; color:var(--gray-600); }
+    .results-filter-select { padding:7px 28px 7px 12px; border:1.5px solid var(--gray-200); border-radius:var(--radius-full); font-size:.82rem; font-family:inherit; color:var(--navy); outline:none; cursor:pointer; background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; appearance:none; -webkit-appearance:none; }
+    .results-filter-select:focus { border-color:var(--blue-600); }
+    .results-count-tag { margin-left:auto; font-size:.8rem; color:var(--gray-500); }
 
-    /* ── Provider card with tiers ── */
-    .provider-card {
-      background: var(--white); border: 1px solid var(--gray-200);
-      border-radius: var(--radius-lg); padding: 20px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: all var(--transition); position: relative; overflow: hidden;
-    }
-    .provider-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--blue-100); }
-    .provider-card--premium { border-color: #d97706; border-width: 2px; }
-    .provider-card--premium::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 3px; background: linear-gradient(90deg, #d97706, #f59e0b);
-    }
-    .provider-card--promoted { border-color: var(--blue-200); }
-    .provider-card--promoted::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 3px; background: linear-gradient(90deg, var(--blue-600), #38bdf8);
-    }
-    .tier-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: .68rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: .5px; border-radius: var(--radius-full); padding: 3px 9px;
-    }
-    .tier-badge--premium { background: #fef3c7; color: #92400e; }
-    .tier-badge--promoted { background: var(--blue-50); color: var(--blue-700); }
-    .tier-badge--basic { background: var(--gray-100); color: var(--gray-600); }
-    .ecm-badge { background: #dcfce7; color: #15803d; font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    /* ── Provider cards ── */
+    .provider-card { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:20px; display:flex; flex-direction:column; gap:12px; transition:all var(--transition); position:relative; overflow:hidden; }
+    .provider-card:hover { box-shadow:var(--shadow-md); transform:translateY(-3px); border-color:var(--blue-100); }
+    .provider-card--premium { border-color:#d97706; border-width:2px; }
+    .provider-card--premium::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#d97706,#f59e0b); }
+    .provider-card--promoted { border-color:var(--blue-200); }
+    .provider-card--promoted::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue-600),#38bdf8); }
+    .tier-badge { display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px; border-radius:var(--radius-full); padding:3px 9px; }
+    .tier-badge--premium { background:#fef3c7; color:#92400e; }
+    .tier-badge--promoted { background:var(--blue-50); color:var(--blue-700); }
+    .tier-badge--basic { background:var(--gray-100); color:var(--gray-600); }
+    .ecm-badge { background:#dcfce7; color:#15803d; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+    .empty-state { text-align:center; padding:56px 24px; grid-column:1/-1; }
+    .empty-state__icon { font-size:3rem; margin-bottom:16px; }
+    .empty-state__title { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--navy); margin-bottom:8px; }
+    .empty-state__sub { font-size:.9rem; color:var(--gray-500); margin-bottom:24px; max-width:380px; margin-left:auto; margin-right:auto; }
 
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center; padding: 56px 24px;
-      grid-column: 1 / -1;
-    }
-    .empty-state__icon { font-size: 3rem; margin-bottom: 16px; }
-    .empty-state__title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 8px; }
-    .empty-state__sub { font-size: .9rem; color: var(--gray-500); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+    /* ── Hero on dark ── */
+    .hero { background:linear-gradient(135deg,var(--navy) 0%,#1e3a8a 60%,#1e40af 100%); }
+    .hero__title { color:var(--white); }
+    .hero__title em { color:#93c5fd; }
+    .hero__subtitle { color:var(--blue-100); }
+    .hero__eyebrow { color:var(--blue-100); }
+    .hero__note-item { color:rgba(255,255,255,.65); }
+    .hero__note-item::before { background:rgba(255,255,255,.3); }
 
-    /* ── Hero on dark bg ── */
-    .hero { background: linear-gradient(135deg, var(--navy) 0%, #1e3a8a 60%, #1e40af 100%); }
-    .hero__title { color: var(--white); }
-    .hero__title em { color: #93c5fd; }
-    .hero__subtitle { color: var(--blue-100); }
-    .hero__eyebrow { color: var(--blue-100); }
-    .hero__note-item { color: rgba(255,255,255,.65); }
-    .hero__note-item::before { background: rgba(255,255,255,.3); }
+    /* ── City strip ── */
+    .city-strip { background:var(--cream-2); border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200); padding:14px 0; }
+    .city-strip__inner { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .city-strip__label { font-size:.8rem; color:var(--gray-500); white-space:nowrap; }
+    .city-strip__links { display:flex; gap:8px; flex-wrap:wrap; }
+    .city-strip__link { font-size:.8rem; color:var(--blue-600); font-weight:600; text-decoration:none; padding:4px 12px; border-radius:var(--radius-full); border:1px solid var(--blue-100); background:var(--white); transition:all var(--transition); }
+    .city-strip__link:hover { background:var(--blue-50); border-color:var(--blue-300); }
 
-    /* ── Directory promo strip ── */
-    .dir-strip {
-      background: var(--cream-2); border-top: 1px solid var(--gray-200);
-      border-bottom: 1px solid var(--gray-200); padding: 18px 0;
+    /* ── Chat widget ── */
+    .chat-widget {
+      max-width:580px; margin:0 auto;
+      background:var(--white); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-md); overflow:hidden;
+      border:1px solid var(--gray-200);
     }
-    .dir-strip__inner {
-      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    .chat-widget__header {
+      background:var(--navy); padding:16px 20px;
+      display:flex; align-items:center; gap:14px;
     }
-    .dir-strip__label { font-size: .82rem; color: var(--gray-500); }
-    .dir-strip__links { display: flex; gap: 10px; flex-wrap: wrap; }
-    .dir-strip__link {
-      font-size: .82rem; color: var(--blue-600); font-weight: 600;
-      text-decoration: none; padding: 4px 12px; border-radius: var(--radius-full);
-      border: 1px solid var(--blue-100); background: var(--white);
-      transition: all var(--transition);
+    .chat-widget__avatar {
+      width:44px; height:44px; border-radius:50%;
+      background:linear-gradient(135deg,var(--blue-600),#1e40af);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem; flex-shrink:0;
     }
-    .dir-strip__link:hover { background: var(--blue-50); border-color: var(--blue-300); }
+    .chat-widget__info { flex:1; }
+    .chat-widget__name { color:var(--white); font-weight:700; font-size:.95rem; }
+    .chat-widget__status { color:#4ade80; font-size:.72rem; display:flex; align-items:center; gap:5px; }
+    .chat-widget__step-indicator {
+      background:rgba(255,255,255,.12); border-radius:var(--radius-full);
+      padding:4px 12px; font-size:.72rem; color:rgba(255,255,255,.75);
+      font-weight:600; white-space:nowrap;
+    }
+    .chat-widget__progress { height:3px; background:rgba(255,255,255,.15); }
+    .chat-widget__progress-fill { height:100%; background:var(--amber); transition:width .5s ease; }
+    .chat-widget__body {
+      padding:20px; min-height:180px; max-height:320px; overflow-y:auto;
+      display:flex; flex-direction:column; gap:12px;
+      scroll-behavior:smooth;
+    }
+    .chat-msg { display:flex; gap:10px; align-items:flex-end; }
+    .chat-msg--user { flex-direction:row-reverse; }
+    .chat-msg__avatar {
+      width:32px; height:32px; border-radius:50%; flex-shrink:0;
+      background:var(--navy); display:flex; align-items:center;
+      justify-content:center; font-size:.85rem;
+    }
+    .chat-msg__avatar--user {
+      background:var(--blue-600); font-size:.65rem; font-weight:700; color:var(--white);
+    }
+    .chat-msg__bubble {
+      padding:10px 14px; border-radius:16px; max-width:75%;
+      font-size:.875rem; line-height:1.55; word-break:break-word;
+    }
+    .chat-msg--bot .chat-msg__bubble { background:var(--cream-2); color:var(--navy); border-bottom-left-radius:4px; }
+    .chat-msg__bubble--user { background:var(--blue-600); color:var(--white); border-bottom-right-radius:4px; }
+    .chat-widget__input { border-top:1px solid var(--gray-100); }
+    .chat-options { display:flex; flex-wrap:wrap; gap:8px; padding:16px 20px; }
+    .chat-option-btn {
+      padding:9px 18px; border:1.5px solid var(--blue-200); border-radius:var(--radius-full);
+      font-size:.83rem; font-weight:600; color:var(--blue-700); background:var(--white);
+      cursor:pointer; transition:all var(--transition); font-family:inherit; text-align:left;
+    }
+    .chat-option-btn:hover { background:var(--blue-600); color:var(--white); border-color:var(--blue-600); transform:translateY(-1px); }
+    .chat-zip-row { display:flex; gap:10px; padding:16px 20px; }
+    .chat-text-input {
+      flex:1; padding:11px 14px; border:1.5px solid var(--gray-200);
+      border-radius:var(--radius); font-family:inherit; font-size:.875rem; outline:none;
+    }
+    .chat-text-input:focus { border-color:var(--blue-600); }
+    .chat-contact-form { display:flex; flex-direction:column; gap:10px; padding:16px 20px; }
+    .chat-privacy-note { font-size:.75rem; color:var(--gray-400); text-align:center; margin:0; }
+    .chat-done { padding:32px 20px; text-align:center; }
+    .chat-done__icon { font-size:2.8rem; margin-bottom:12px; }
+    .chat-done__title { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--navy); margin-bottom:8px; }
+    .chat-done__sub { font-size:.875rem; color:var(--gray-500); line-height:1.75; margin-bottom:0; }
+
+    /* ── Service cards ── */
+    .service-card__tagline { font-size:.75rem; color:var(--gray-400); margin-top:2px; display:block; }
   </style>
 </head>
 <body>
 
-  <!-- ── LOCATION CHANGE MODAL ───────────────────────────── -->
+  <!-- ── LOCATION MODAL ── -->
   <div class="loc-modal-overlay" id="loc-modal-overlay" onclick="handleModalOverlayClick(event)">
     <div class="loc-modal">
       <h2 class="loc-modal__title">Set your location</h2>
-      <p class="loc-modal__sub">Searching for a parent in another city? Enter their location below.</p>
+      <p class="loc-modal__sub">Searching for a parent in a different city? Enter their location.</p>
       <input class="loc-modal__input" id="loc-zip-input" type="text" placeholder="ZIP code (e.g. 78701)" maxlength="5" />
       <div class="loc-modal__or">— or —</div>
       <input class="loc-modal__input" id="loc-city-input" type="text" placeholder="City name (e.g. Austin)" />
@@ -193,7 +211,7 @@
     </div>
   </div>
 
-  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <!-- ── HEADER ── -->
   <header class="header" id="site-header">
     <div class="container header__inner">
       <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
@@ -206,14 +224,11 @@
     </div>
   </header>
 
-  <!-- ── HERO ──────────────────────────────────────────────── -->
+  <!-- ── HERO ── -->
   <section class="hero">
     <div class="container hero__inner">
 
-      <!-- Left: Text + Search -->
       <div class="hero__content animate-fade-up">
-
-        <!-- Auto-detected location bar -->
         <div class="location-bar">
           <span class="location-bar__dot"></span>
           <span id="location-display">your area</span>
@@ -224,11 +239,9 @@
           Find Elder Care<br>Near <em id="hero-city-em">Your Home</em>
         </h1>
         <p class="hero__subtitle">
-          Select the type of care you need and we'll instantly show you
-          verified local providers — free for families.
+          Select the type of care you need — we'll show you verified local providers instantly. Free for families.
         </p>
 
-        <!-- Type-only search bar -->
         <div class="search-v2" id="search-bar">
           <select class="search-v2__select" id="care-type-select">
             <option value="">All care types…</option>
@@ -251,7 +264,6 @@
         </div>
       </div>
 
-      <!-- Right: Floating provider preview cards -->
       <div class="hero__visual animate-slide-in" aria-hidden="true">
         <div class="hero__card">
           <div class="hero__card-avatar">🏠</div>
@@ -277,34 +289,32 @@
     </div>
   </section>
 
-  <!-- ── DIRECTORY QUICK LINKS ─────────────────────────────── -->
-  <div class="dir-strip">
-    <div class="container dir-strip__inner">
-      <span class="dir-strip__label">Browse by city:</span>
-      <div class="dir-strip__links">
-        <a href="location-austin-tx.html" class="dir-strip__link">Austin, TX</a>
-        <a href="directory.html" class="dir-strip__link">New York, NY</a>
-        <a href="directory.html" class="dir-strip__link">Los Angeles, CA</a>
-        <a href="directory.html" class="dir-strip__link">Chicago, IL</a>
-        <a href="directory.html" class="dir-strip__link">Miami, FL</a>
-        <a href="directory.html" class="dir-strip__link">Houston, TX</a>
-        <a href="directory.html" class="dir-strip__link">All cities →</a>
+  <!-- ── CITY STRIP ── -->
+  <div class="city-strip">
+    <div class="container city-strip__inner">
+      <span class="city-strip__label">Browse by city:</span>
+      <div class="city-strip__links">
+        <a href="location-austin-tx.html" class="city-strip__link">Austin, TX</a>
+        <a href="directory.html" class="city-strip__link">New York, NY</a>
+        <a href="directory.html" class="city-strip__link">Los Angeles, CA</a>
+        <a href="directory.html" class="city-strip__link">Chicago, IL</a>
+        <a href="directory.html" class="city-strip__link">Miami, FL</a>
+        <a href="directory.html" class="city-strip__link">Houston, TX</a>
+        <a href="directory.html" class="city-strip__link">All cities →</a>
       </div>
     </div>
   </div>
 
-  <!-- ── SEARCH RESULTS ────────────────────────────────────── -->
+  <!-- ── SEARCH RESULTS ── -->
   <section class="section section--white" id="search-results" style="display:none; padding-top:40px; padding-bottom:48px;">
     <div class="container">
       <div class="section__header" style="margin-bottom:0;">
         <p class="section__eyebrow" id="results-eyebrow"></p>
         <h2 class="section__title" id="results-title" style="margin-bottom:4px;"></h2>
-        <p style="font-size:.875rem; color:var(--gray-500); margin-bottom:20px;" id="results-subtitle"></p>
+        <p style="font-size:.875rem;color:var(--gray-500);margin-bottom:20px;" id="results-subtitle"></p>
       </div>
-
-      <!-- Filter bar inside results -->
       <div class="results-filter-bar">
-        <label>Filter:</label>
+        <label>Filter by type:</label>
         <select class="results-filter-select" id="results-type-filter" onchange="filterResults()">
           <option value="">All types</option>
           <option value="Home Care Agency">Home Care</option>
@@ -316,20 +326,18 @@
         </select>
         <span class="results-count-tag" id="results-count-tag"></span>
       </div>
-
-      <div id="provider-results-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:20px;"></div>
-
+      <div id="provider-results-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px;"></div>
       <div class="text-center mt-32">
-        <p style="font-size:.875rem; color:var(--gray-500); margin-bottom:16px;">Want a personalised match? Tell us more about your needs.</p>
+        <p style="font-size:.875rem;color:var(--gray-500);margin-bottom:16px;">Want a personalised match? Let our advisor help.</p>
         <a href="#chatbot-section" class="btn btn--primary"
-           onclick="document.getElementById('chatbot-section').scrollIntoView({behavior:'smooth'}); return false;">
+           onclick="document.getElementById('chatbot-section').scrollIntoView({behavior:'smooth'});return false;">
           Start Free Match →
         </a>
       </div>
     </div>
   </section>
 
-  <!-- ── TRUST BAR ─────────────────────────────────────────── -->
+  <!-- ── TRUST BAR ── -->
   <div class="trust-bar">
     <div class="container trust-bar__inner">
       <div class="trust-stat"><span class="trust-stat__num">12,847</span><span>families matched</span></div>
@@ -342,126 +350,113 @@
     </div>
   </div>
 
-  <!-- ── HOW IT WORKS ───────────────────────────────────────── -->
-  <section class="section section--white">
+  <!-- ── CHATBOT — main conversion ── -->
+  <section class="section section--white" id="chatbot-section">
     <div class="container">
       <div class="section__header">
-        <p class="section__eyebrow">Simple Process</p>
-        <h2 class="section__title">How ElderCareMatters Works</h2>
-        <p class="section__subtitle">From your first question to your first conversation — in under 2 minutes.</p>
+        <p class="section__eyebrow">Free Matching Service</p>
+        <h2 class="section__title">Get Your Free Care Matches</h2>
+        <p class="section__subtitle">Chat with our care advisor — 6 quick questions, no cost, no obligation.</p>
       </div>
-      <div class="steps-timeline">
-        <div class="step-item">
-          <div class="step-item__icon">📝</div>
-          <h3 class="step-item__title">Describe Your Needs</h3>
-          <p class="step-item__desc">Tell us who needs care, the type of service, your location, urgency, and budget. Takes under 2 minutes.</p>
+
+      <!-- Chat widget -->
+      <div class="chat-widget" id="chatbot">
+        <div class="chat-widget__header">
+          <div class="chat-widget__avatar">👩‍⚕️</div>
+          <div class="chat-widget__info">
+            <div class="chat-widget__name">ECM Care Advisor</div>
+            <div class="chat-widget__status">
+              <span style="width:7px;height:7px;background:#4ade80;border-radius:50%;display:inline-block;"></span>
+              Online · Free for families
+            </div>
+          </div>
+          <div class="chat-widget__step-indicator">Step 1 of 6</div>
         </div>
-        <div class="step-item">
-          <div class="step-item__icon">🔍</div>
-          <h3 class="step-item__title">We Score & Match</h3>
-          <p class="step-item__desc">Your request is scored for quality and intent, then geo-matched to verified providers in your exact area.</p>
+        <div class="chat-widget__progress">
+          <div class="chat-widget__progress-fill" style="width:0%"></div>
         </div>
-        <div class="step-item">
-          <div class="step-item__icon">🤝</div>
-          <h3 class="step-item__title">Providers Reach Out</h3>
-          <p class="step-item__desc">Matched providers contact you through the platform. You choose who to work with — no obligation.</p>
-        </div>
+        <div class="chat-widget__body"></div>
+        <div class="chat-widget__input"></div>
       </div>
-      <div class="text-center mt-32">
-        <a href="how-it-works.html" class="btn btn--secondary">See Full Walkthrough →</a>
-      </div>
+
     </div>
   </section>
 
-  <!-- ── CARE TYPE DIRECTORY ────────────────────────────────── -->
+  <!-- ── BROWSE BY CARE TYPE ── -->
   <section class="section section--cream" id="services">
     <div class="container">
       <div class="section__header">
         <p class="section__eyebrow">Services We Match</p>
         <h2 class="section__title">Browse by Care Type</h2>
-        <p class="section__subtitle">Select a category to instantly filter providers in your area.</p>
+        <p class="section__subtitle">Select a category to instantly see verified providers in your area.</p>
       </div>
       <div class="services-grid">
-        <div class="service-card card--hover" onclick="selectServiceType('Home Care Agency')">
+        <div class="service-card card--hover" data-type="Home Care Agency" onclick="selectServiceType('Home Care Agency')">
           <span class="service-card__icon">🏠</span>
           <span class="service-card__label">Home Care</span>
-          <span class="service-card__count">240+ providers</span>
+          <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" onclick="selectServiceType('Assisted Living')">
+        <div class="service-card card--hover" data-type="Assisted Living" onclick="selectServiceType('Assisted Living')">
           <span class="service-card__icon">🏡</span>
           <span class="service-card__label">Assisted Living</span>
-          <span class="service-card__count">95+ providers</span>
+          <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" onclick="selectServiceType('Memory Care Facility')">
+        <div class="service-card card--hover" data-type="Memory Care Facility" onclick="selectServiceType('Memory Care Facility')">
           <span class="service-card__icon">🧠</span>
           <span class="service-card__label">Memory Care</span>
-          <span class="service-card__count">68+ providers</span>
+          <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" onclick="selectServiceType('Elder Law Attorney')">
+        <div class="service-card card--hover" data-type="Elder Law Attorney" onclick="selectServiceType('Elder Law Attorney')">
           <span class="service-card__icon">⚖️</span>
           <span class="service-card__label">Elder Law</span>
-          <span class="service-card__count">120+ attorneys</span>
+          <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" onclick="selectServiceType('Care Manager')">
+        <div class="service-card card--hover" data-type="Care Manager" onclick="selectServiceType('Care Manager')">
           <span class="service-card__icon">📋</span>
           <span class="service-card__label">Care Management</span>
-          <span class="service-card__count">80+ managers</span>
+          <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" onclick="selectServiceType('Hospice Provider')">
+        <div class="service-card card--hover" data-type="Hospice Provider" onclick="selectServiceType('Hospice Provider')">
           <span class="service-card__icon">🤝</span>
           <span class="service-card__label">Hospice</span>
-          <span class="service-card__count">45+ providers</span>
+          <span class="service-card__count">Loading…</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ── STATS ─────────────────────────────────────────────── -->
-  <section class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-item__value">12<span class="stat-item__suffix">k+</span></div>
-          <div class="stat-item__label">Families successfully matched</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-item__value">500<span class="stat-item__suffix">+</span></div>
-          <div class="stat-item__label">Verified providers nationwide</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-item__value">96<span class="stat-item__suffix">%</span></div>
-          <div class="stat-item__label">Families satisfied with their match</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-item__value">48<span class="stat-item__suffix">hr</span></div>
-          <div class="stat-item__label">Average first response time</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── INTAKE CHATBOT ─────────────────────────────────────── -->
-  <section class="section section--white" id="chatbot-section">
+  <!-- ── HOW IT WORKS ── -->
+  <section class="section section--white">
     <div class="container">
       <div class="section__header">
-        <p class="section__eyebrow">Free Matching Service</p>
-        <h2 class="section__title">Start Your Free Match</h2>
-        <p class="section__subtitle">Answer 6 short questions. No cost, no commitment — takes under 2 minutes.</p>
+        <p class="section__eyebrow">Simple Process</p>
+        <h2 class="section__title">How It Works</h2>
+        <p class="section__subtitle">From your first question to a provider conversation — in under 2 minutes.</p>
       </div>
-      <div class="chatbot" id="chatbot">
-        <div class="chatbot__progress-bar">
-          <div class="chatbot__progress-fill" style="width:0%"></div>
+      <div class="steps-timeline">
+        <div class="step-item">
+          <div class="step-item__icon">📝</div>
+          <h3 class="step-item__title">Describe Your Needs</h3>
+          <p class="step-item__desc">Answer 6 short questions: who needs care, what type, your location, urgency, and budget.</p>
         </div>
-        <div class="chatbot__body">
-          <p class="chatbot__step-label"></p>
-          <p class="chatbot__question"></p>
-          <div class="chatbot__answer-area"></div>
+        <div class="step-item">
+          <div class="step-item__icon">🔍</div>
+          <h3 class="step-item__title">We Match & Score</h3>
+          <p class="step-item__desc">Your request is geo-matched to verified local providers ranked by quality and relevance.</p>
         </div>
+        <div class="step-item">
+          <div class="step-item__icon">🤝</div>
+          <h3 class="step-item__title">Providers Reach Out</h3>
+          <p class="step-item__desc">Up to 3 matched providers contact you. You decide who to work with — no obligation.</p>
+        </div>
+      </div>
+      <div class="text-center mt-32">
+        <a href="how-it-works.html" class="btn btn--secondary">Full Walkthrough →</a>
       </div>
     </div>
   </section>
 
-  <!-- ── TESTIMONIALS ───────────────────────────────────────── -->
+  <!-- ── TESTIMONIALS ── -->
   <section class="section section--cream">
     <div class="container">
       <div class="section__header">
@@ -472,7 +467,7 @@
       <div class="testimonials-grid">
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">I was overwhelmed trying to find memory care for my mother. Within 48 hours of using ElderCareMatters, I had three verified providers calling me. We found the perfect facility within a week.</p>
+          <p class="testimonial-card__text">"I was overwhelmed trying to find memory care for my mother. Within 48 hours of using ElderCareMatters, I had three verified providers calling me. We found the perfect facility within a week."</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#2563EB,#1e40af);">L</div>
             <div>
@@ -484,7 +479,7 @@
         </div>
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">My father needed an elder law attorney urgently for estate planning. The platform matched us with a local specialist in under 24 hours. Incredibly smooth and stress-free.</p>
+          <p class="testimonial-card__text">"My father needed an elder law attorney urgently. The platform matched us with a local specialist in under 24 hours. Incredibly smooth and stress-free."</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#0F766E,#115e59);">M</div>
             <div>
@@ -496,7 +491,7 @@
         </div>
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">As a working parent caring for my ageing in-laws, I had no time to research providers. ECM did all the hard work. Professional, responsive, and exactly what we needed.</p>
+          <p class="testimonial-card__text">"As a working parent caring for my ageing in-laws, I had no time to research. ECM did all the hard work. Professional, responsive, and exactly what we needed."</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#D97706,#b45309);">S</div>
             <div>
@@ -510,14 +505,14 @@
     </div>
   </section>
 
-  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <!-- ── FOOTER ── -->
   <footer class="footer">
     <div class="container">
       <div class="footer__top">
         <div>
           <p class="footer__brand">ElderCareMatters</p>
           <p class="footer__tagline">Connecting families with trusted elder care providers across the United States. Free, guided, and always transparent.</p>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <span class="footer__badge">✓ Verified Providers</span>
             <span class="footer__badge">🔒 Privacy Protected</span>
           </div>
@@ -560,9 +555,8 @@
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
   <script>
-    const header = document.getElementById('site-header');
     window.addEventListener('scroll', () => {
-      header.classList.toggle('scrolled', window.scrollY > 10);
+      document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
     });
   </script>
 </body>
