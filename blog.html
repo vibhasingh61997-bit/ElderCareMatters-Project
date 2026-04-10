@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elder Care Resources & Guides — ElderCareMatters</title>
+  <meta name="description" content="Expert guides, checklists, and resources to help families navigate elder care decisions — home care, assisted living, memory care, and more." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .blog-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:28px; }
+    .blog-card { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); overflow:hidden; transition:all var(--transition); display:flex; flex-direction:column; }
+    .blog-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); border-color:var(--blue-100); }
+    .blog-card__img { height:180px; display:flex; align-items:center; justify-content:center; font-size:3.5rem; }
+    .blog-card__body { padding:22px 24px; flex:1; display:flex; flex-direction:column; }
+    .blog-card__tag { display:inline-block; background:var(--blue-50); color:var(--blue-700); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; border-radius:var(--radius-full); padding:3px 10px; margin-bottom:10px; }
+    .blog-card__title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--navy); margin-bottom:8px; line-height:1.4; }
+    .blog-card__excerpt { font-size:.855rem; color:var(--gray-500); line-height:1.7; flex:1; }
+    .blog-card__meta { display:flex; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--gray-100); font-size:.78rem; color:var(--gray-400); }
+    .blog-card__read { color:var(--blue-600); font-weight:700; font-size:.82rem; text-decoration:none; margin-top:14px; display:inline-flex; align-items:center; gap:5px; }
+    .blog-card__read:hover { color:var(--blue-700); }
+    .blog-card__img--home { background:linear-gradient(135deg,#dbeafe,#eff6ff); }
+    .blog-card__img--memory { background:linear-gradient(135deg,#fde8d8,#fef3eb); }
+    .blog-card__img--legal { background:linear-gradient(135deg,#d1fae5,#ecfdf5); }
+    .blog-card__img--finance { background:linear-gradient(135deg,#fef9c3,#fefce8); }
+    .blog-card__img--assisted { background:linear-gradient(135deg,#ede9fe,#f5f3ff); }
+    .blog-card__img--hospice { background:linear-gradient(135deg,#fce7f3,#fdf2f8); }
+    .blog-card__img--checklist { background:linear-gradient(135deg,#ccfbf1,#f0fdfa); }
+    .blog-card__img--guide { background:linear-gradient(135deg,#e0f2fe,#f0f9ff); }
+    .blog-card__img--compare { background:linear-gradient(135deg,#f1f5f9,#f8fafc); }
+    .featured-card { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; border-radius:var(--radius-lg); border:1px solid var(--gray-200); background:var(--white); transition:all var(--transition); }
+    @media(max-width:640px){ .featured-card { grid-template-columns:1fr; } }
+    .featured-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); }
+    .featured-card__visual { min-height:260px; background:linear-gradient(135deg,var(--navy),#1e40af); display:flex; align-items:center; justify-content:center; font-size:5rem; }
+    .featured-card__body { padding:36px; display:flex; flex-direction:column; justify-content:center; }
+    .featured-badge { display:inline-block; background:var(--amber); color:var(--white); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; border-radius:var(--radius-full); padding:4px 12px; margin-bottom:14px; }
+    .featured-card__title { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:var(--navy); margin-bottom:14px; line-height:1.35; }
+    .featured-card__excerpt { font-size:.9rem; color:var(--gray-500); line-height:1.75; margin-bottom:22px; }
+    .cat-filter { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px; }
+    .cat-btn { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius-full); padding:7px 18px; font-size:.82rem; font-weight:600; color:var(--gray-600); cursor:pointer; transition:all var(--transition); }
+    .cat-btn.active, .cat-btn:hover { background:var(--blue-600); border-color:var(--blue-600); color:var(--white); }
+    .location-section { background:var(--navy); border-radius:var(--radius-lg); padding:40px; margin-top:64px; }
+    .location-section h2 { font-family:'Playfair Display',serif; color:var(--white); font-size:1.5rem; margin-bottom:8px; }
+    .location-section p { color:var(--blue-100); font-size:.9rem; margin-bottom:24px; }
+    .location-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+    .location-link { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius); padding:10px 14px; color:var(--white); font-size:.82rem; font-weight:600; text-decoration:none; transition:all var(--transition); display:flex; align-items:center; gap:6px; }
+    .location-link:hover { background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.25); }
+    .newsletter-strip { background:var(--cream-2); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:36px; text-align:center; margin-top:48px; }
+    .newsletter-strip h3 { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--navy); margin-bottom:8px; }
+    .newsletter-strip p { font-size:.875rem; color:var(--gray-500); margin-bottom:22px; }
+    .newsletter-form { display:flex; gap:10px; max-width:440px; margin:0 auto; }
+    .newsletter-form input { flex:1; padding:11px 16px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.9rem; font-family:inherit; outline:none; }
+    .newsletter-form input:focus { border-color:var(--blue-600); }
+  </style>
+</head>
+<body>
+
+  <header class="header" id="site-header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="blog.html" class="active">Resources</a>
+        <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" style="padding:72px 0 56px; text-align:center;">
+    <div class="container" style="max-width:680px;">
+      <div class="hero__eyebrow" style="justify-content:center; margin:0 auto 22px;">
+        <span class="hero__eyebrow-dot"></span>
+        Free Resources · Expert Guides · Local Guides
+      </div>
+      <h1 class="hero__title" style="font-size:clamp(2rem,4vw,2.8rem);">
+        Elder Care <em>Resources & Guides</em>
+      </h1>
+      <p class="hero__subtitle" style="margin:0 auto 32px;">
+        Expert-written articles to help families navigate every stage of the elder care journey — from first conversations to final decisions.
+      </p>
+    </div>
+  </section>
+
+  <!-- Trust bar -->
+  <div class="trust-bar">
+    <div class="container trust-bar__inner">
+      <div class="trust-stat"><span class="trust-stat__num">50+</span><span>expert guides</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">Free</span><span>always, no login</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">6</span><span>care categories</span></div>
+      <div class="trust-stat__divider"></div>
+      <div class="trust-stat"><span class="trust-stat__num">50+</span><span>cities covered</span></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <section class="section section--white">
+    <div class="container">
+
+      <!-- Category filter -->
+      <div class="cat-filter">
+        <button class="cat-btn active">All Guides</button>
+        <button class="cat-btn">Home Care</button>
+        <button class="cat-btn">Assisted Living</button>
+        <button class="cat-btn">Memory Care</button>
+        <button class="cat-btn">Legal & Financial</button>
+        <button class="cat-btn">Hospice</button>
+        <button class="cat-btn">Checklists</button>
+      </div>
+
+      <div class="blog-grid">
+
+        <!-- Featured article -->
+        <a href="guide-choosing-care.html" class="featured-card" style="text-decoration:none;">
+          <div class="featured-card__visual">🏡</div>
+          <div class="featured-card__body">
+            <span class="featured-badge">⭐ Editor's Pick</span>
+            <h2 class="featured-card__title">The Complete Guide to Choosing Elder Care in 2026</h2>
+            <p class="featured-card__excerpt">Navigating elder care options can feel overwhelming. This guide walks families through every option — from in-home aides to assisted living — with checklists, questions to ask providers, and red flags to watch for.</p>
+            <span class="btn btn--primary btn--sm" style="align-self:flex-start;">Read Guide →</span>
+          </div>
+        </a>
+
+        <!-- Article cards -->
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--home">🏠</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Home Care</span>
+            <h3 class="blog-card__title">Home Care vs. Home Health: What's the Difference?</h3>
+            <p class="blog-card__excerpt">Many families confuse "home care" with "home health." Learn the key distinctions, what Medicare covers, and which is right for your loved one's needs.</p>
+            <div class="blog-card__meta">📅 Mar 2026 · ⏱ 5 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--memory">🧠</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Memory Care</span>
+            <h3 class="blog-card__title">When Is It Time for Memory Care? 7 Signs to Watch For</h3>
+            <p class="blog-card__excerpt">Caring for a loved one with dementia at home has limits. These seven warning signs indicate it may be time to explore a dedicated memory care facility.</p>
+            <div class="blog-card__meta">📅 Feb 2026 · ⏱ 7 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--legal">⚖️</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Legal & Financial</span>
+            <h3 class="blog-card__title">Elder Law 101: Powers of Attorney, Wills & Medicaid Planning</h3>
+            <p class="blog-card__excerpt">A practical overview of the legal documents every family should have in place before a care crisis — written in plain language by elder law attorneys.</p>
+            <div class="blog-card__meta">📅 Jan 2026 · ⏱ 8 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--finance">💰</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Legal & Financial</span>
+            <h3 class="blog-card__title">How to Pay for Assisted Living: A Family Finance Guide</h3>
+            <p class="blog-card__excerpt">Assisted living costs average $4,500/month. This guide covers Medicare, Medicaid, long-term care insurance, veteran benefits, and private pay options.</p>
+            <div class="blog-card__meta">📅 Jan 2026 · ⏱ 9 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--assisted">🏢</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Assisted Living</span>
+            <h3 class="blog-card__title">20 Questions to Ask When Touring an Assisted Living Facility</h3>
+            <p class="blog-card__excerpt">Don't be caught off guard. Use this expert-compiled checklist to ask the right questions on facility tours — from staffing ratios to meal quality.</p>
+            <div class="blog-card__meta">📅 Dec 2025 · ⏱ 4 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--hospice">💙</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Hospice</span>
+            <h3 class="blog-card__title">Understanding Hospice Care: What Families Need to Know</h3>
+            <p class="blog-card__excerpt">Hospice is about living well in the final chapter. This compassionate guide explains eligibility, what's covered, and how to talk to your family about the decision.</p>
+            <div class="blog-card__meta">📅 Dec 2025 · ⏱ 6 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--checklist">✅</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Checklist</span>
+            <h3 class="blog-card__title">Elder Care Planning Checklist: 30 Steps Before a Crisis</h3>
+            <p class="blog-card__excerpt">Use this printable checklist to get ahead of care needs before an emergency forces rushed decisions. Covers legal, medical, financial, and housing steps.</p>
+            <div class="blog-card__meta">📅 Nov 2025 · ⏱ 3 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--guide">🗺️</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Home Care</span>
+            <h3 class="blog-card__title">How to Hire a Home Care Aide: Vetting, Contracts & Safety</h3>
+            <p class="blog-card__excerpt">Hiring privately vs. through an agency each has tradeoffs. This guide covers background checks, fair contracts, backup care plans, and red flags to avoid.</p>
+            <div class="blog-card__meta">📅 Nov 2025 · ⏱ 7 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+        <div class="blog-card">
+          <div class="blog-card__img blog-card__img--compare">📊</div>
+          <div class="blog-card__body">
+            <span class="blog-card__tag">Comparison</span>
+            <h3 class="blog-card__title">Assisted Living vs. Nursing Home: Which Is Right?</h3>
+            <p class="blog-card__excerpt">These two terms are often confused. This side-by-side breakdown covers care levels, costs, regulations, and what conditions each setting handles best.</p>
+            <div class="blog-card__meta">📅 Oct 2025 · ⏱ 5 min read</div>
+            <a href="guide-choosing-care.html" class="blog-card__read">Read article →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Location pages section -->
+      <div class="location-section">
+        <h2>Find Local Elder Care Guides</h2>
+        <p>Browse provider listings and local resources by city. Every location page includes vetted providers, average costs, and local regulations.</p>
+        <div class="location-grid">
+          <a href="location-new-york-ny.html" class="location-link">📍 New York, NY</a>
+          <a href="location-los-angeles-ca.html" class="location-link">📍 Los Angeles, CA</a>
+          <a href="location-chicago-il.html" class="location-link">📍 Chicago, IL</a>
+          <a href="location-houston-tx.html" class="location-link">📍 Houston, TX</a>
+          <a href="location-phoenix-az.html" class="location-link">📍 Phoenix, AZ</a>
+          <a href="location-philadelphia-pa.html" class="location-link">📍 Philadelphia, PA</a>
+          <a href="location-san-antonio-tx.html" class="location-link">📍 San Antonio, TX</a>
+          <a href="location-san-diego-ca.html" class="location-link">📍 San Diego, CA</a>
+          <a href="location-dallas-tx.html" class="location-link">📍 Dallas, TX</a>
+          <a href="location-austin-tx.html" class="location-link">📍 Austin, TX</a>
+          <a href="location-miami-fl.html" class="location-link">📍 Miami, FL</a>
+          <a href="location-seattle-wa.html" class="location-link">📍 Seattle, WA</a>
+          <a href="location-boston-ma.html" class="location-link">📍 Boston, MA</a>
+          <a href="location-denver-co.html" class="location-link">📍 Denver, CO</a>
+          <a href="location-atlanta-ga.html" class="location-link">📍 Atlanta, GA</a>
+          <a href="location-portland-or.html" class="location-link">📍 Portland, OR</a>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="newsletter-strip">
+        <h3>Get Elder Care Guides in Your Inbox</h3>
+        <p>New guides, checklists, and local resources — delivered monthly. No spam, unsubscribe any time.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="your@email.com" />
+          <button class="btn btn--primary" onclick="subscribeNewsletter(this)">Subscribe</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Ready to find care in your area?</h2>
+        <p class="cta-banner__subtitle">Answer a few questions and we'll match you with verified local providers — free for families.</p>
+      </div>
+      <a href="index.html#chatbot-section" class="btn btn--white btn--lg">Start Free Match →</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <p class="footer__brand">ElderCareMatters</p>
+          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;"><span class="footer__badge">✓ Verified Providers</span><span class="footer__badge">🔒 Privacy Protected</span></div>
+        </div>
+        <div><p class="footer__col-title">For Families</p><div class="footer__col-links"><a href="how-it-works.html">How It Works</a><a href="index.html#services">Browse Services</a><a href="blog.html">Resources & Guides</a><a href="consumer-dashboard.html">My Care Request</a></div></div>
+        <div><p class="footer__col-title">For Providers</p><div class="footer__col-links"><a href="for-providers.html">Provider Overview</a><a href="for-providers.html#pricing">Pricing & Plans</a><a href="provider-dashboard.html">Provider Login</a></div></div>
+        <div><p class="footer__col-title">Company</p><div class="footer__col-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Privacy Policy</a></div></div>
+      </div>
+      <div class="footer__bottom"><p>© 2026 ElderCareMatters. All rights reserved.</p><p>Free for families · Verified providers · No spam</p></div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Category filter
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    function subscribeNewsletter(btn) {
+      const input = btn.previousElementSibling;
+      if (!input.value || !input.value.includes('@')) {
+        input.style.borderColor = '#ef4444';
+        return;
+      }
+      btn.textContent = 'Subscribed ✓';
+      btn.style.background = '#16a34a';
+      input.value = '';
+      input.style.borderColor = '';
+    }
+  </script>
+</body>
+</html>

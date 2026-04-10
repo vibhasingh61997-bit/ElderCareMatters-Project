@@ -4,10 +4,194 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ElderCareMatters — Find Trusted Elder Care Near You</title>
-  <meta name="description" content="Connect with verified elder care providers in your area — home care, assisted living, memory care, elder law and more. Free for families." />
+  <meta name="description" content="Find verified elder care providers near you — home care, assisted living, memory care, elder law and more. Free for families." />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Location bar ── */
+    .location-bar {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+      border-radius: var(--radius-full); padding: 6px 14px;
+      font-size: .82rem; color: var(--white); margin-bottom: 20px;
+    }
+    .location-bar__dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink:0; }
+    .location-bar__change {
+      background: none; border: none; color: rgba(255,255,255,.65);
+      font-size: .78rem; cursor: pointer; text-decoration: underline;
+      padding: 0; font-family: inherit;
+    }
+    .location-bar__change:hover { color: var(--white); }
+
+    /* ── New search bar v2 ── */
+    .search-v2 {
+      display: flex; align-items: stretch; gap: 0;
+      background: var(--white); border-radius: var(--radius-lg);
+      box-shadow: 0 8px 32px rgba(0,0,0,.18); overflow: hidden;
+      max-width: 560px;
+    }
+    .search-v2__select {
+      flex: 1; border: none; outline: none; padding: 16px 18px;
+      font-size: .95rem; font-family: inherit; color: var(--navy);
+      background: var(--white); cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .search-v2__select:focus { background-color: #f0f9ff; }
+    .search-v2__divider { width: 1px; background: var(--gray-200); flex-shrink: 0; }
+    .search-v2__btn {
+      background: linear-gradient(135deg, var(--blue-600), #1e40af);
+      color: var(--white); border: none; padding: 16px 26px;
+      font-size: .95rem; font-weight: 700; cursor: pointer;
+      font-family: inherit; white-space: nowrap; transition: opacity .15s;
+    }
+    .search-v2__btn:hover { opacity: .92; }
+
+    /* ── Location modal ── */
+    .loc-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .loc-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .loc-modal {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 32px; width: 90%; max-width: 420px;
+      box-shadow: var(--shadow-xl, 0 25px 60px rgba(0,0,0,.2));
+      transform: translateY(12px); transition: transform .2s;
+    }
+    .loc-modal-overlay.open .loc-modal { transform: translateY(0); }
+    .loc-modal__title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 6px; }
+    .loc-modal__sub { font-size: .83rem; color: var(--gray-500); margin-bottom: 22px; }
+    .loc-modal__input {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); font-size: .9rem; font-family: inherit;
+      outline: none; box-sizing: border-box; margin-bottom: 10px;
+    }
+    .loc-modal__input:focus { border-color: var(--blue-600); }
+    .loc-modal__or { text-align: center; color: var(--gray-400); font-size: .78rem; margin: 10px 0; }
+    .loc-modal__state { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); font-size: .9rem; font-family: inherit; outline: none; box-sizing: border-box; margin-bottom: 16px; }
+    .loc-modal__state:focus { border-color: var(--blue-600); }
+    .loc-modal__actions { display: flex; gap: 10px; }
+    .loc-modal__cancel { background: none; border: 1.5px solid var(--gray-200); border-radius: var(--radius); padding: 10px 18px; font-size: .875rem; cursor: pointer; font-family: inherit; color: var(--gray-600); }
+    .loc-modal__cancel:hover { border-color: var(--gray-400); }
+
+    /* ── Results filter bar ── */
+    .results-filter-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 20px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .results-filter-bar label { font-size: .82rem; font-weight: 600; color: var(--gray-600); }
+    .results-filter-select {
+      padding: 7px 28px 7px 12px; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-full); font-size: .82rem; font-family: inherit;
+      color: var(--navy); outline: none; cursor: pointer;
+      background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+      appearance: none; -webkit-appearance: none;
+    }
+    .results-filter-select:focus { border-color: var(--blue-600); }
+    .results-count-tag { margin-left: auto; font-size: .8rem; color: var(--gray-500); }
+
+    /* ── Provider card with tiers ── */
+    .provider-card {
+      background: var(--white); border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg); padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: all var(--transition); position: relative; overflow: hidden;
+    }
+    .provider-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--blue-100); }
+    .provider-card--premium { border-color: #d97706; border-width: 2px; }
+    .provider-card--premium::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg, #d97706, #f59e0b);
+    }
+    .provider-card--promoted { border-color: var(--blue-200); }
+    .provider-card--promoted::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg, var(--blue-600), #38bdf8);
+    }
+    .tier-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .68rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .5px; border-radius: var(--radius-full); padding: 3px 9px;
+    }
+    .tier-badge--premium { background: #fef3c7; color: #92400e; }
+    .tier-badge--promoted { background: var(--blue-50); color: var(--blue-700); }
+    .tier-badge--basic { background: var(--gray-100); color: var(--gray-600); }
+    .ecm-badge { background: #dcfce7; color: #15803d; font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 56px 24px;
+      grid-column: 1 / -1;
+    }
+    .empty-state__icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state__title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 8px; }
+    .empty-state__sub { font-size: .9rem; color: var(--gray-500); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+
+    /* ── Hero on dark bg ── */
+    .hero { background: linear-gradient(135deg, var(--navy) 0%, #1e3a8a 60%, #1e40af 100%); }
+    .hero__title { color: var(--white); }
+    .hero__title em { color: #93c5fd; }
+    .hero__subtitle { color: var(--blue-100); }
+    .hero__eyebrow { color: var(--blue-100); }
+    .hero__note-item { color: rgba(255,255,255,.65); }
+    .hero__note-item::before { background: rgba(255,255,255,.3); }
+
+    /* ── Directory promo strip ── */
+    .dir-strip {
+      background: var(--cream-2); border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200); padding: 18px 0;
+    }
+    .dir-strip__inner {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .dir-strip__label { font-size: .82rem; color: var(--gray-500); }
+    .dir-strip__links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .dir-strip__link {
+      font-size: .82rem; color: var(--blue-600); font-weight: 600;
+      text-decoration: none; padding: 4px 12px; border-radius: var(--radius-full);
+      border: 1px solid var(--blue-100); background: var(--white);
+      transition: all var(--transition);
+    }
+    .dir-strip__link:hover { background: var(--blue-50); border-color: var(--blue-300); }
+  </style>
 </head>
 <body>
+
+  <!-- ── LOCATION CHANGE MODAL ───────────────────────────── -->
+  <div class="loc-modal-overlay" id="loc-modal-overlay" onclick="handleModalOverlayClick(event)">
+    <div class="loc-modal">
+      <h2 class="loc-modal__title">Set your location</h2>
+      <p class="loc-modal__sub">Searching for a parent in another city? Enter their location below.</p>
+      <input class="loc-modal__input" id="loc-zip-input" type="text" placeholder="ZIP code (e.g. 78701)" maxlength="5" />
+      <div class="loc-modal__or">— or —</div>
+      <input class="loc-modal__input" id="loc-city-input" type="text" placeholder="City name (e.g. Austin)" />
+      <select class="loc-modal__state" id="loc-state-select">
+        <option value="">Select state…</option>
+        <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+        <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+        <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+        <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+        <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+        <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+        <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+        <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+        <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+        <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+        <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+        <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+        <option>WI</option><option>WY</option>
+      </select>
+      <div class="loc-modal__actions">
+        <button class="loc-modal__cancel" onclick="closeLocationModal()">Cancel</button>
+        <button class="btn btn--primary" style="flex:1;" onclick="applyLocation()">Update Location</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── HEADER ──────────────────────────────────────────── -->
   <header class="header" id="site-header">
@@ -15,8 +199,8 @@
       <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
       <nav class="header__nav">
         <a href="how-it-works.html">How It Works</a>
-        <a href="index.html#services">Services</a>
-        <a href="for-providers.html">For Providers</a>
+        <a href="directory.html">Find Care</a>
+        <a href="blog.html">Resources</a>
         <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
       </nav>
     </div>
@@ -28,28 +212,41 @@
 
       <!-- Left: Text + Search -->
       <div class="hero__content animate-fade-up">
-        <div class="hero__eyebrow">
-          <span class="hero__eyebrow-dot"></span>
-          Free for Families · Trusted by 12,000+ Caregivers
+
+        <!-- Auto-detected location bar -->
+        <div class="location-bar">
+          <span class="location-bar__dot"></span>
+          <span id="location-display">your area</span>
+          <button class="location-bar__change" onclick="openLocationModal()">Change</button>
         </div>
+
         <h1 class="hero__title">
-          Find the Right<br><em>Elder Care,</em><br>Close to Home
+          Find Elder Care<br>Near <em id="hero-city-em">Your Home</em>
         </h1>
         <p class="hero__subtitle">
-          Answer a few questions and we'll connect you with verified local
-          providers — home care, assisted living, elder law, memory care and more.
+          Select the type of care you need and we'll instantly show you
+          verified local providers — free for families.
         </p>
 
-        <div class="search-bar" id="search-bar">
-          <input id="zip-input" class="search-bar__input" type="text"
-                 placeholder="Enter your ZIP code (e.g. 78701)" maxlength="5" />
-          <button class="search-bar__btn" onclick="handleSearch()">Find Care Near Me</button>
+        <!-- Type-only search bar -->
+        <div class="search-v2" id="search-bar">
+          <select class="search-v2__select" id="care-type-select">
+            <option value="">All care types…</option>
+            <option value="Home Care Agency">🏠 Home Care</option>
+            <option value="Assisted Living">🏡 Assisted Living</option>
+            <option value="Memory Care Facility">🧠 Memory Care</option>
+            <option value="Elder Law Attorney">⚖️ Elder Law Attorney</option>
+            <option value="Care Manager">📋 Care Management</option>
+            <option value="Hospice Provider">🤝 Hospice</option>
+          </select>
+          <div class="search-v2__divider"></div>
+          <button class="search-v2__btn" onclick="handleSearch()">Find Providers</button>
         </div>
         <p class="search-error" id="search-error"></p>
 
         <div class="hero__note">
-          <span class="hero__note-item">No cost to families</span>
-          <span class="hero__note-item">Providers are pre-screened</span>
+          <span class="hero__note-item">Free for families</span>
+          <span class="hero__note-item">Providers pre-screened</span>
           <span class="hero__note-item">No spam, ever</span>
         </div>
       </div>
@@ -61,9 +258,9 @@
           <div class="hero__card-info">
             <div class="hero__card-name">Sunrise Home Care</div>
             <div class="hero__card-stars">★★★★★</div>
-            <div class="hero__card-meta">Austin, TX · Home Care Agency</div>
+            <div class="hero__card-meta">Austin, TX · Home Care</div>
           </div>
-          <div class="hero__card-badge">✓ ECM Verified</div>
+          <div class="hero__card-badge">🏆 Premium</div>
         </div>
         <div class="hero__match-label">2 more providers matched near you</div>
         <div class="hero__card">
@@ -71,24 +268,57 @@
           <div class="hero__card-info">
             <div class="hero__card-name">Austin Elder Law Group</div>
             <div class="hero__card-stars">★★★★★</div>
-            <div class="hero__card-meta">Austin, TX · Elder Law Attorney</div>
+            <div class="hero__card-meta">Austin, TX · Elder Law</div>
           </div>
-          <div class="hero__card-badge">✓ ECM Verified</div>
+          <div class="hero__card-badge">⭐ Promoted</div>
         </div>
       </div>
 
     </div>
   </section>
 
+  <!-- ── DIRECTORY QUICK LINKS ─────────────────────────────── -->
+  <div class="dir-strip">
+    <div class="container dir-strip__inner">
+      <span class="dir-strip__label">Browse by city:</span>
+      <div class="dir-strip__links">
+        <a href="location-austin-tx.html" class="dir-strip__link">Austin, TX</a>
+        <a href="directory.html" class="dir-strip__link">New York, NY</a>
+        <a href="directory.html" class="dir-strip__link">Los Angeles, CA</a>
+        <a href="directory.html" class="dir-strip__link">Chicago, IL</a>
+        <a href="directory.html" class="dir-strip__link">Miami, FL</a>
+        <a href="directory.html" class="dir-strip__link">Houston, TX</a>
+        <a href="directory.html" class="dir-strip__link">All cities →</a>
+      </div>
+    </div>
+  </div>
+
   <!-- ── SEARCH RESULTS ────────────────────────────────────── -->
-  <section class="section section--white" id="search-results" style="display:none; padding-top:48px; padding-bottom:48px;">
+  <section class="section section--white" id="search-results" style="display:none; padding-top:40px; padding-bottom:48px;">
     <div class="container">
       <div class="section__header" style="margin-bottom:0;">
         <p class="section__eyebrow" id="results-eyebrow"></p>
-        <h2 class="section__title" id="results-title"></h2>
-        <p class="section__subtitle" style="margin-bottom:32px;" id="results-subtitle"></p>
+        <h2 class="section__title" id="results-title" style="margin-bottom:4px;"></h2>
+        <p style="font-size:.875rem; color:var(--gray-500); margin-bottom:20px;" id="results-subtitle"></p>
       </div>
-      <div id="provider-results-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;"></div>
+
+      <!-- Filter bar inside results -->
+      <div class="results-filter-bar">
+        <label>Filter:</label>
+        <select class="results-filter-select" id="results-type-filter" onchange="filterResults()">
+          <option value="">All types</option>
+          <option value="Home Care Agency">Home Care</option>
+          <option value="Assisted Living">Assisted Living</option>
+          <option value="Memory Care Facility">Memory Care</option>
+          <option value="Elder Law Attorney">Elder Law</option>
+          <option value="Care Manager">Care Management</option>
+          <option value="Hospice Provider">Hospice</option>
+        </select>
+        <span class="results-count-tag" id="results-count-tag"></span>
+      </div>
+
+      <div id="provider-results-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:20px;"></div>
+
       <div class="text-center mt-32">
         <p style="font-size:.875rem; color:var(--gray-500); margin-bottom:16px;">Want a personalised match? Tell us more about your needs.</p>
         <a href="#chatbot-section" class="btn btn--primary"
@@ -102,25 +332,13 @@
   <!-- ── TRUST BAR ─────────────────────────────────────────── -->
   <div class="trust-bar">
     <div class="container trust-bar__inner">
-      <div class="trust-stat">
-        <span class="trust-stat__num">12,847</span>
-        <span>families matched</span>
-      </div>
+      <div class="trust-stat"><span class="trust-stat__num">12,847</span><span>families matched</span></div>
       <div class="trust-stat__divider"></div>
-      <div class="trust-stat">
-        <span class="trust-stat__num">500+</span>
-        <span>verified providers</span>
-      </div>
+      <div class="trust-stat"><span class="trust-stat__num">500+</span><span>verified providers</span></div>
       <div class="trust-stat__divider"></div>
-      <div class="trust-stat">
-        <span class="trust-stat__num">4.9★</span>
-        <span>average provider rating</span>
-      </div>
+      <div class="trust-stat"><span class="trust-stat__num">4.9★</span><span>average rating</span></div>
       <div class="trust-stat__divider"></div>
-      <div class="trust-stat">
-        <span class="trust-stat__num">48hrs</span>
-        <span>avg. first response time</span>
-      </div>
+      <div class="trust-stat"><span class="trust-stat__num">48hrs</span><span>avg. first response</span></div>
     </div>
   </div>
 
@@ -130,11 +348,8 @@
       <div class="section__header">
         <p class="section__eyebrow">Simple Process</p>
         <h2 class="section__title">How ElderCareMatters Works</h2>
-        <p class="section__subtitle">
-          From your first question to your first conversation — in under 2 minutes.
-        </p>
+        <p class="section__subtitle">From your first question to your first conversation — in under 2 minutes.</p>
       </div>
-
       <div class="steps-timeline">
         <div class="step-item">
           <div class="step-item__icon">📝</div>
@@ -152,7 +367,6 @@
           <p class="step-item__desc">Matched providers contact you through the platform. You choose who to work with — no obligation.</p>
         </div>
       </div>
-
       <div class="text-center mt-32">
         <a href="how-it-works.html" class="btn btn--secondary">See Full Walkthrough →</a>
       </div>
@@ -165,37 +379,35 @@
       <div class="section__header">
         <p class="section__eyebrow">Services We Match</p>
         <h2 class="section__title">Browse by Care Type</h2>
-        <p class="section__subtitle">
-          Select a category to find verified providers who specialise in exactly what you need.
-        </p>
+        <p class="section__subtitle">Select a category to instantly filter providers in your area.</p>
       </div>
       <div class="services-grid">
-        <div class="service-card card--hover" onclick="selectService('Home Care')">
+        <div class="service-card card--hover" onclick="selectServiceType('Home Care Agency')">
           <span class="service-card__icon">🏠</span>
           <span class="service-card__label">Home Care</span>
           <span class="service-card__count">240+ providers</span>
         </div>
-        <div class="service-card card--hover" onclick="selectService('Assisted Living')">
+        <div class="service-card card--hover" onclick="selectServiceType('Assisted Living')">
           <span class="service-card__icon">🏡</span>
           <span class="service-card__label">Assisted Living</span>
           <span class="service-card__count">95+ providers</span>
         </div>
-        <div class="service-card card--hover" onclick="selectService('Memory Care')">
+        <div class="service-card card--hover" onclick="selectServiceType('Memory Care Facility')">
           <span class="service-card__icon">🧠</span>
           <span class="service-card__label">Memory Care</span>
           <span class="service-card__count">68+ providers</span>
         </div>
-        <div class="service-card card--hover" onclick="selectService('Elder Law')">
+        <div class="service-card card--hover" onclick="selectServiceType('Elder Law Attorney')">
           <span class="service-card__icon">⚖️</span>
           <span class="service-card__label">Elder Law</span>
           <span class="service-card__count">120+ attorneys</span>
         </div>
-        <div class="service-card card--hover" onclick="selectService('Care Management')">
+        <div class="service-card card--hover" onclick="selectServiceType('Care Manager')">
           <span class="service-card__icon">📋</span>
           <span class="service-card__label">Care Management</span>
           <span class="service-card__count">80+ managers</span>
         </div>
-        <div class="service-card card--hover" onclick="selectService('Hospice')">
+        <div class="service-card card--hover" onclick="selectServiceType('Hospice Provider')">
           <span class="service-card__icon">🤝</span>
           <span class="service-card__label">Hospice</span>
           <span class="service-card__count">45+ providers</span>
@@ -258,14 +470,9 @@
         <p class="section__subtitle">Real stories from families who found the right care through ElderCareMatters.</p>
       </div>
       <div class="testimonials-grid">
-
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">
-            I was overwhelmed trying to find memory care for my mother. Within 48 hours
-            of using ElderCareMatters, I had three verified providers calling me. We found
-            the perfect facility for her within a week.
-          </p>
+          <p class="testimonial-card__text">I was overwhelmed trying to find memory care for my mother. Within 48 hours of using ElderCareMatters, I had three verified providers calling me. We found the perfect facility within a week.</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#2563EB,#1e40af);">L</div>
             <div>
@@ -275,14 +482,9 @@
             </div>
           </div>
         </div>
-
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">
-            My father needed an elder law attorney urgently for estate planning. The
-            platform matched us with a local specialist in under 24 hours. The process
-            was incredibly smooth and stress-free.
-          </p>
+          <p class="testimonial-card__text">My father needed an elder law attorney urgently for estate planning. The platform matched us with a local specialist in under 24 hours. Incredibly smooth and stress-free.</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#0F766E,#115e59);">M</div>
             <div>
@@ -292,14 +494,9 @@
             </div>
           </div>
         </div>
-
         <div class="testimonial-card card--hover">
           <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__text">
-            As a working parent caring for my ageing in-laws, I had no time to research
-            providers. ECM did all the hard work. The providers were professional,
-            responsive, and exactly what we needed.
-          </p>
+          <p class="testimonial-card__text">As a working parent caring for my ageing in-laws, I had no time to research providers. ECM did all the hard work. Professional, responsive, and exactly what we needed.</p>
           <div class="testimonial-card__author">
             <div class="testimonial-card__avatar" style="background:linear-gradient(135deg,#D97706,#b45309);">S</div>
             <div>
@@ -309,24 +506,6 @@
             </div>
           </div>
         </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ── PROVIDER CTA ───────────────────────────────────────── -->
-  <section class="cta-banner">
-    <div class="container cta-banner__inner">
-      <div>
-        <h2 class="cta-banner__title">Are you a care provider<br>or elder law attorney?</h2>
-        <p class="cta-banner__subtitle">
-          Access geo-matched, scored leads with transparent pricing and
-          measurable ROI. Join 500+ providers already growing with ECM.
-        </p>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-start;">
-        <a href="for-providers.html" class="btn btn--white btn--lg">See Provider Plans →</a>
-        <p style="font-size:.75rem; color:rgba(255,255,255,.5); text-align:center;">No setup fee · Cancel anytime</p>
       </div>
     </div>
   </section>
@@ -337,10 +516,7 @@
       <div class="footer__top">
         <div>
           <p class="footer__brand">ElderCareMatters</p>
-          <p class="footer__tagline">
-            Connecting families with trusted elder care providers across
-            the United States. Free, guided, and always transparent.
-          </p>
+          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States. Free, guided, and always transparent.</p>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <span class="footer__badge">✓ Verified Providers</span>
             <span class="footer__badge">🔒 Privacy Protected</span>
@@ -350,18 +526,18 @@
           <p class="footer__col-title">For Families</p>
           <div class="footer__col-links">
             <a href="how-it-works.html">How It Works</a>
-            <a href="index.html#services">Browse Services</a>
+            <a href="directory.html">Find Care Near You</a>
+            <a href="blog.html">Resources & Guides</a>
             <a href="consumer-dashboard.html">My Care Request</a>
-            <a href="#">FAQs</a>
           </div>
         </div>
         <div>
-          <p class="footer__col-title">For Providers</p>
+          <p class="footer__col-title">Browse by City</p>
           <div class="footer__col-links">
-            <a href="for-providers.html">Provider Overview</a>
-            <a href="for-providers.html#pricing">Pricing & Plans</a>
-            <a href="provider-dashboard.html">Provider Login</a>
-            <a href="#">Become a Partner</a>
+            <a href="location-austin-tx.html">Austin, TX</a>
+            <a href="directory.html">New York, NY</a>
+            <a href="directory.html">Los Angeles, CA</a>
+            <a href="directory.html">All Locations →</a>
           </div>
         </div>
         <div>
@@ -369,8 +545,8 @@
           <div class="footer__col-links">
             <a href="#">About Us</a>
             <a href="#">Contact</a>
+            <a href="for-providers.html">For Providers</a>
             <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
           </div>
         </div>
       </div>
@@ -384,7 +560,6 @@
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
   <script>
-    // Sticky header shadow on scroll
     const header = document.getElementById('site-header');
     window.addEventListener('scroll', () => {
       header.classList.toggle('scrolled', window.scrollY > 10);

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elder Care in Austin, TX — Find Verified Providers | ElderCareMatters</title>
+  <meta name="description" content="Find trusted elder care providers in Austin, TX. Compare home care agencies, assisted living facilities, memory care, and elder law attorneys. Free matching service for Austin families." />
+  <meta name="keywords" content="elder care Austin TX, home care Austin, assisted living Austin Texas, memory care Austin, senior care Austin" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .loc-hero { background:linear-gradient(135deg,var(--navy) 0%,#1e40af 100%); color:var(--white); padding:80px 0 64px; }
+    .loc-hero__eyebrow { font-size:.75rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--blue-100); margin-bottom:14px; font-weight:700; }
+    .loc-hero__title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,2.8rem); font-weight:800; margin-bottom:16px; color:var(--white); }
+    .loc-hero__title em { color:#93c5fd; font-style:italic; }
+    .loc-hero__subtitle { font-size:1rem; color:var(--blue-100); line-height:1.7; max-width:520px; margin-bottom:32px; }
+    .loc-hero__stats { display:flex; gap:32px; flex-wrap:wrap; }
+    .loc-stat { }
+    .loc-stat__num { font-size:1.6rem; font-weight:800; color:var(--white); font-family:'Playfair Display',serif; }
+    .loc-stat__label { font-size:.75rem; color:var(--blue-100); }
+    .loc-grid { display:grid; grid-template-columns:1fr 340px; gap:40px; align-items:flex-start; }
+    @media(max-width:768px){ .loc-grid { grid-template-columns:1fr; } }
+    .provider-list { display:flex; flex-direction:column; gap:18px; }
+    .provider-row { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:22px 24px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:flex-start; transition:all var(--transition); }
+    .provider-row:hover { box-shadow:var(--shadow-md); border-color:var(--blue-100); transform:translateY(-2px); }
+    .provider-row__name { font-weight:700; color:var(--navy); font-size:1rem; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+    .provider-row__type { font-size:.75rem; color:var(--gray-500); margin-bottom:8px; }
+    .provider-row__meta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .provider-row__rating { font-size:.82rem; font-weight:700; color:var(--amber); }
+    .provider-row__reviews { font-size:.78rem; color:var(--gray-400); }
+    .provider-row__spec { font-size:.72rem; background:var(--blue-50); color:var(--blue-700); border-radius:var(--radius-full); padding:3px 10px; font-weight:600; }
+    .provider-row__cta { }
+    .badge-ecm { background:linear-gradient(135deg,#16a34a,#15803d); color:var(--white); font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:.6px; border-radius:var(--radius-full); padding:3px 9px; }
+    .sticky-cta { position:sticky; top:88px; background:var(--white); border:1.5px solid var(--blue-100); border-radius:var(--radius-lg); padding:28px; box-shadow:var(--shadow-md); }
+    .sticky-cta__title { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--navy); margin-bottom:8px; font-weight:700; }
+    .sticky-cta__sub { font-size:.83rem; color:var(--gray-500); margin-bottom:20px; line-height:1.6; }
+    .intake-mini { display:flex; flex-direction:column; gap:10px; }
+    .intake-mini select, .intake-mini input { padding:10px 14px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.875rem; font-family:inherit; outline:none; width:100%; }
+    .intake-mini select:focus, .intake-mini input:focus { border-color:var(--blue-600); }
+    .local-info { background:var(--cream-2); border-radius:var(--radius-lg); padding:28px; margin-top:32px; }
+    .local-info h3 { font-weight:700; color:var(--navy); margin-bottom:12px; font-size:.95rem; }
+    .local-info ul { padding-left:0; list-style:none; display:flex; flex-direction:column; gap:6px; }
+    .local-info ul li { font-size:.83rem; color:var(--gray-600); display:flex; gap:8px; }
+    .cost-table { width:100%; border-collapse:collapse; margin-top:24px; }
+    .cost-table th { background:var(--navy); color:var(--white); font-size:.78rem; padding:10px 14px; text-align:left; }
+    .cost-table td { font-size:.83rem; padding:10px 14px; border-bottom:1px solid var(--gray-100); color:var(--gray-700); }
+    .cost-table tr:last-child td { border-bottom:none; }
+    .cost-table tr:nth-child(even) td { background:var(--cream); }
+    .breadcrumb { font-size:.78rem; color:var(--blue-100); margin-bottom:16px; }
+    .breadcrumb a { color:var(--blue-100); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--white); }
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+    .filter-chip { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius-full); padding:6px 16px; font-size:.8rem; font-weight:600; color:var(--gray-600); cursor:pointer; transition:all var(--transition); }
+    .filter-chip.active, .filter-chip:hover { background:var(--blue-600); border-color:var(--blue-600); color:var(--white); }
+    .section-title-sm { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--navy); margin-bottom:20px; }
+    .faq-item { background:var(--white); border:1px solid var(--gray-200); border-radius:var(--radius-lg); padding:18px 22px; margin-bottom:8px; cursor:pointer; transition:all var(--transition); }
+    .faq-item:hover { border-color:var(--blue-100); }
+    .faq-item__q { font-weight:700; color:var(--navy); font-size:.9rem; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .faq-item__a { font-size:.855rem; color:var(--gray-600); line-height:1.75; margin-top:10px; display:none; }
+    .faq-item.open .faq-item__a { display:block; }
+    .faq-chevron { transition:transform var(--transition); font-size:.75rem; color:var(--gray-400); }
+    .faq-item.open .faq-chevron { transform:rotate(180deg); }
+  </style>
+</head>
+<body>
+
+  <header class="header" id="site-header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <a href="how-it-works.html">How It Works</a>
+        <a href="index.html#services">Services</a>
+        <a href="for-providers.html">For Providers</a>
+        <a href="blog.html">Resources</a>
+        <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Location Hero -->
+  <section class="loc-hero">
+    <div class="container">
+      <p class="breadcrumb"><a href="index.html">Home</a> › <a href="blog.html">Locations</a> › Texas › Austin</p>
+      <p class="loc-hero__eyebrow">📍 Austin, TX · Travis County</p>
+      <h1 class="loc-hero__title">Elder Care in <em>Austin, Texas</em></h1>
+      <p class="loc-hero__subtitle">Find verified home care agencies, assisted living facilities, memory care specialists, and elder law attorneys serving Austin and surrounding Travis County communities.</p>
+      <div class="loc-hero__stats">
+        <div class="loc-stat">
+          <div class="loc-stat__num">18</div>
+          <div class="loc-stat__label">Verified providers</div>
+        </div>
+        <div class="loc-stat">
+          <div class="loc-stat__num">4.7★</div>
+          <div class="loc-stat__label">Avg. rating</div>
+        </div>
+        <div class="loc-stat">
+          <div class="loc-stat__num">Free</div>
+          <div class="loc-stat__label">For families</div>
+        </div>
+        <div class="loc-stat">
+          <div class="loc-stat__num">24hr</div>
+          <div class="loc-stat__label">Avg. response</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="section section--cream">
+    <div class="container">
+      <div class="loc-grid">
+
+        <!-- Left: Provider list -->
+        <div>
+          <div class="filter-bar">
+            <button class="filter-chip active">All Types</button>
+            <button class="filter-chip">Home Care</button>
+            <button class="filter-chip">Assisted Living</button>
+            <button class="filter-chip">Memory Care</button>
+            <button class="filter-chip">Elder Law</button>
+            <button class="filter-chip">Hospice</button>
+          </div>
+
+          <h2 class="section-title-sm">18 Verified Providers in Austin, TX</h2>
+
+          <div class="provider-list">
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Austin Senior Home Care <span class="badge-ecm">ECM Verified</span></div>
+                <div class="provider-row__type">🏠 Home Care Agency</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.9</span>
+                  <span class="provider-row__reviews">(142 reviews)</span>
+                  <span class="provider-row__spec">Companionship</span>
+                  <span class="provider-row__spec">Personal Care</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Hill Country Memory Care <span class="badge-ecm">ECM Verified</span></div>
+                <div class="provider-row__type">🧠 Memory Care Facility</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.8</span>
+                  <span class="provider-row__reviews">(87 reviews)</span>
+                  <span class="provider-row__spec">Dementia</span>
+                  <span class="provider-row__spec">Alzheimer's</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Capitol City Assisted Living</div>
+                <div class="provider-row__type">🏢 Assisted Living</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.6</span>
+                  <span class="provider-row__reviews">(63 reviews)</span>
+                  <span class="provider-row__spec">Independent Living</span>
+                  <span class="provider-row__spec">Assisted Living</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Austin Elder Law Group <span class="badge-ecm">ECM Verified</span></div>
+                <div class="provider-row__type">⚖️ Elder Law Attorney</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.9</span>
+                  <span class="provider-row__reviews">(51 reviews)</span>
+                  <span class="provider-row__spec">Estate Planning</span>
+                  <span class="provider-row__spec">Medicaid</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Lone Star Hospice Care <span class="badge-ecm">ECM Verified</span></div>
+                <div class="provider-row__type">💙 Hospice Provider</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.8</span>
+                  <span class="provider-row__reviews">(38 reviews)</span>
+                  <span class="provider-row__spec">Palliative</span>
+                  <span class="provider-row__spec">Grief Support</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <div class="provider-row">
+              <div>
+                <div class="provider-row__name">Austin Care Managers</div>
+                <div class="provider-row__type">👩‍⚕️ Geriatric Care Manager</div>
+                <div class="provider-row__meta">
+                  <span class="provider-row__rating">⭐ 4.7</span>
+                  <span class="provider-row__reviews">(29 reviews)</span>
+                  <span class="provider-row__spec">Care Coordination</span>
+                  <span class="provider-row__spec">Assessments</span>
+                </div>
+              </div>
+              <div class="provider-row__cta">
+                <a href="index.html#chatbot-section" class="btn btn--primary btn--sm">Request Info</a>
+              </div>
+            </div>
+
+            <!-- Load more placeholder -->
+            <div style="text-align:center; padding:20px 0;">
+              <button class="btn btn--secondary" onclick="showMoreProviders(this)">Show 12 More Providers →</button>
+            </div>
+          </div>
+
+          <!-- Local cost info -->
+          <div class="local-info" style="margin-top:40px;">
+            <h3>Average Elder Care Costs in Austin, TX (2026)</h3>
+            <table class="cost-table">
+              <thead>
+                <tr><th>Care Type</th><th>Monthly Cost</th><th>vs. National Avg.</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Home Care (44 hrs/wk)</td><td>$4,200 – $5,800</td><td>↑ 8% higher</td></tr>
+                <tr><td>Assisted Living</td><td>$3,800 – $5,200</td><td>≈ Average</td></tr>
+                <tr><td>Memory Care</td><td>$5,100 – $7,400</td><td>↑ 6% higher</td></tr>
+                <tr><td>Nursing Home (semi-private)</td><td>$6,200 – $8,100</td><td>↑ 5% higher</td></tr>
+                <tr><td>Adult Day Services</td><td>$900 – $1,400</td><td>↓ 4% lower</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Local FAQ -->
+          <div style="margin-top:40px;">
+            <h2 class="section-title-sm">Austin Elder Care FAQ</h2>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-item__q">Does Texas Medicaid cover assisted living? <span class="faq-chevron">▼</span></div>
+              <div class="faq-item__a">Texas offers STAR+PLUS Medicaid waiver that can help pay for home and community-based services including some assisted living costs. Eligibility is based on income, assets, and care needs. An elder law attorney can help you apply.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-item__q">Are Austin assisted living facilities licensed? <span class="faq-chevron">▼</span></div>
+              <div class="faq-item__a">Yes. Texas HHSC (Health and Human Services Commission) licenses and inspects assisted living facilities. You can verify a facility's license and inspection history on the HHSC website.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-item__q">What ZIP codes in Austin do providers cover? <span class="faq-chevron">▼</span></div>
+              <div class="faq-item__a">Most Austin providers cover Travis County including ZIP codes 78701–78705, 78710–78718, 78721–78735, 78741–78758, 78759, and surrounding areas in Williamson and Hays counties.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+              <div class="faq-item__q">How do I check a home care agency's Texas license? <span class="faq-chevron">▼</span></div>
+              <div class="faq-item__a">Home care agencies in Texas must be licensed by HHSC. Search the Provider Search tool on the Texas HHSC website to verify any agency's license status and compliance history.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Sticky CTA -->
+        <div>
+          <div class="sticky-cta">
+            <p class="sticky-cta__title">Get Matched with Austin Providers</p>
+            <p class="sticky-cta__sub">Tell us what you need and we'll connect you with verified Austin providers — free, no obligation, in under 2 minutes.</p>
+            <div class="intake-mini">
+              <select>
+                <option value="">Select care type…</option>
+                <option>Home Care</option>
+                <option>Assisted Living</option>
+                <option>Memory Care</option>
+                <option>Elder Law Attorney</option>
+                <option>Hospice</option>
+                <option>Geriatric Care Manager</option>
+              </select>
+              <input type="text" placeholder="ZIP code (e.g. 78701)" maxlength="5" />
+              <input type="text" placeholder="Your name" />
+              <input type="tel" placeholder="Phone number" />
+              <button class="btn btn--primary" style="width:100%;" onclick="submitLocIntake(this)">Find Austin Providers →</button>
+            </div>
+            <p style="font-size:.72rem; color:var(--gray-400); text-align:center; margin-top:12px;">Free for families · Max 3 providers · No spam</p>
+          </div>
+
+          <div class="local-info" style="margin-top:20px;">
+            <h3>Quick Austin Resources</h3>
+            <ul>
+              <li>🏛️ Area Agency on Aging — Austin Travis County</li>
+              <li>⚕️ TX HHSC Provider Licensing Search</li>
+              <li>📋 Texas STAR+PLUS Medicaid Waiver Info</li>
+              <li>☎️ Senior Services of Austin: (512) 480-3000</li>
+              <li>📍 Travis County Probate Court (guardianship)</li>
+            </ul>
+          </div>
+
+          <div style="background:var(--blue-50); border:1px solid var(--blue-100); border-radius:var(--radius-lg); padding:20px; margin-top:16px;">
+            <p style="font-size:.82rem; font-weight:700; color:var(--blue-700); margin-bottom:8px;">📖 Related Guides</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <a href="guide-choosing-care.html" style="font-size:.8rem; color:var(--blue-600); text-decoration:none; font-weight:600;">→ How to Choose Elder Care (Complete Guide)</a>
+              <a href="guide-choosing-care.html" style="font-size:.8rem; color:var(--blue-600); text-decoration:none; font-weight:600;">→ Texas Medicaid & Elder Care Financing</a>
+              <a href="guide-choosing-care.html" style="font-size:.8rem; color:var(--blue-600); text-decoration:none; font-weight:600;">→ 20 Questions to Ask on an AL Tour</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Other TX cities -->
+  <section class="section section--white">
+    <div class="container" style="max-width:760px; text-align:center;">
+      <p class="section__eyebrow">Explore Texas</p>
+      <h2 class="section__title">Other Texas Cities</h2>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:24px;">
+        <a href="location-houston-tx.html" class="btn btn--secondary btn--sm">Houston, TX</a>
+        <a href="location-dallas-tx.html" class="btn btn--secondary btn--sm">Dallas, TX</a>
+        <a href="location-san-antonio-tx.html" class="btn btn--secondary btn--sm">San Antonio, TX</a>
+        <a href="blog.html" class="btn btn--secondary btn--sm">All Locations →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Ready to find Austin elder care?</h2>
+        <p class="cta-banner__subtitle">Free matching with verified Austin, TX providers. Takes under 2 minutes.</p>
+      </div>
+      <a href="index.html#chatbot-section" class="btn btn--white btn--lg">Start Free Match →</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <p class="footer__brand">ElderCareMatters</p>
+          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;"><span class="footer__badge">✓ Verified Providers</span><span class="footer__badge">🔒 Privacy Protected</span></div>
+        </div>
+        <div><p class="footer__col-title">For Families</p><div class="footer__col-links"><a href="how-it-works.html">How It Works</a><a href="index.html#services">Browse Services</a><a href="blog.html">Resources & Guides</a><a href="consumer-dashboard.html">My Care Request</a></div></div>
+        <div><p class="footer__col-title">For Providers</p><div class="footer__col-links"><a href="for-providers.html">Provider Overview</a><a href="for-providers.html#pricing">Pricing & Plans</a><a href="provider-dashboard.html">Provider Login</a></div></div>
+        <div><p class="footer__col-title">Company</p><div class="footer__col-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Privacy Policy</a></div></div>
+      </div>
+      <div class="footer__bottom"><p>© 2026 ElderCareMatters. All rights reserved.</p><p>Free for families · Verified providers · No spam</p></div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => item.classList.toggle('open'));
+    });
+
+    function showMoreProviders(btn) {
+      btn.textContent = 'All 18 providers shown';
+      btn.disabled = true;
+      // In production this would load from API
+    }
+
+    function submitLocIntake(btn) {
+      btn.textContent = 'Connecting…';
+      setTimeout(() => {
+        window.location.href = 'index.html#chatbot-section';
+      }, 600);
+    }
+  </script>
+</body>
+</html>
