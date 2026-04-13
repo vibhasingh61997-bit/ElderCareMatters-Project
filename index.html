@@ -33,7 +33,7 @@
 
     /* ── HERO ── */
     .hp-hero {
-      background: linear-gradient(135deg, #0f1f38 0%, #1a2f4e 45%, #1e3a8a 100%);
+      background: linear-gradient(135deg, #0f1f38 0%, #1a2f4e 50%, #0d3d38 100%);
       padding: 72px 0 0;
       position: relative;
       overflow: hidden;
@@ -41,7 +41,7 @@
     .hp-hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 70% 50%, rgba(37,99,235,.18) 0%, transparent 65%);
+      background: radial-gradient(ellipse at 70% 50%, rgba(13,148,136,.2) 0%, transparent 65%);
       pointer-events: none;
     }
     .hp-hero__inner {
@@ -684,14 +684,9 @@
         <button class="search-v2__btn" onclick="handleSearch()">Find Providers</button>
       </div>
       <p class="search-error" id="search-error"></p>
-      <div class="city-link-strip">
-        <span class="city-link-strip__label">Browse city:</span>
-        <a href="location-austin-tx.html">Austin</a>
-        <a href="directory.html">New York</a>
-        <a href="directory.html">Chicago</a>
-        <a href="directory.html">Miami</a>
-        <a href="directory.html">All →</a>
-      </div>
+      <span style="font-size:.78rem; color:var(--gray-400); margin-left:auto;">
+        or <a href="directory.html" style="color:var(--blue-600); font-weight:600; text-decoration:none;">browse full directory →</a>
+      </span>
     </div>
   </div>
 
@@ -961,6 +956,46 @@
     window.addEventListener('scroll', () => {
       document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
     });
+
+    /* ── Service card clicks show ALL providers of that type (no location filter) ── */
+    function selectServiceType(type) {
+      document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.service-card[data-type]').forEach(c => {
+        if (c.getAttribute('data-type') === type) c.classList.add('active');
+      });
+      var sel = document.getElementById('care-type-select');
+      if (sel) sel.value = type;
+      showAllProvidersOfType(type);
+    }
+
+    function showAllProvidersOfType(type) {
+      var resultsSection = document.getElementById('search-results');
+      var grid = document.getElementById('provider-results-grid');
+      if (!resultsSection || !grid) return;
+
+      var all = (typeof PROVIDERS !== 'undefined') ? PROVIDERS : [];
+      var matched = type ? all.filter(function(p){ return p.type === type; }) : all;
+      matched = matched.sort(function(a,b){
+        var order = { featured:0, premium:1, promoted:2, basic:3, free:4 };
+        return (order[a.tier]||9) - (order[b.tier]||9);
+      });
+
+      var typeLabel = type ? type.replace(/ Agency| Facility| Attorney/g,'') : 'Care';
+      var eyebrow  = document.getElementById('results-eyebrow');
+      var title    = document.getElementById('results-title');
+      var subtitle = document.getElementById('results-subtitle');
+      var resFilt  = document.getElementById('results-type-filter');
+
+      if (eyebrow)  eyebrow.textContent  = 'All Locations';
+      if (title)    title.textContent    = matched.length + ' ' + typeLabel + ' Provider' + (matched.length !== 1 ? 's' : '') + ' Available';
+      if (subtitle) subtitle.textContent = 'Verified providers nationwide — use the location bar above to filter by your city.';
+      if (resFilt && type) resFilt.value = type;
+
+      renderProviderCards(matched, grid, 'nationwide', type || 'this care type');
+      resultsSection.style.display = 'block';
+      showToast('Showing all ' + matched.length + ' ' + typeLabel.toLowerCase() + ' providers');
+      setTimeout(function(){ resultsSection.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
+    }
   </script>
 </body>
 </html>
