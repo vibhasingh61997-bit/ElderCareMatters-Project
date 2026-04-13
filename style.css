@@ -28,10 +28,10 @@ button { font-family: inherit; cursor: pointer; border: none; }
   /* Brand */
   --navy:        #1A2F4E;
   --navy-light:  #1E3A5F;
-  --blue-700:    #1D4ED8;
-  --blue-600:    #2563EB;
-  --blue-100:    #DBEAFE;
-  --blue-50:     #EFF6FF;
+  --blue-700:    #0f766e;
+  --blue-600:    #0d9488;
+  --blue-100:    #ccfbf1;
+  --blue-50:     #f0fdfa;
 
   /* Accents */
   --amber:       #D97706;
@@ -75,7 +75,7 @@ button { font-family: inherit; cursor: pointer; border: none; }
   --shadow:    0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
   --shadow-md: 0 8px 24px rgba(0,0,0,.1),  0 2px 6px rgba(0,0,0,.04);
   --shadow-lg: 0 16px 48px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
-  --shadow-blue: 0 4px 20px rgba(29,78,216,.25);
+  --shadow-blue: 0 4px 20px rgba(13,148,136,.3);
 
   /* Transitions */
   --transition: .2s cubic-bezier(.4,0,.2,1);
