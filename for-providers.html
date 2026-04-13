@@ -29,6 +29,24 @@
     .provider-step__dot { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--blue-600),#1e40af); color:var(--white); font-size:1rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; box-shadow:var(--shadow-blue); }
     .provider-step__title { font-weight:700; color:var(--navy); margin-bottom:8px; font-size:.9rem; }
     .provider-step__desc { font-size:.82rem; color:var(--gray-500); line-height:1.65; }
+
+    /* ── Lead distribution flow ── */
+    .lead-dist-flow { display:flex; gap:0; align-items:stretch; margin:40px 0 0; flex-wrap:wrap; }
+    .lead-dist-step { flex:1; min-width:180px; padding:24px 20px; text-align:center; position:relative; }
+    .lead-dist-step::after { content:'→'; position:absolute; right:-12px; top:50%; transform:translateY(-50%); font-size:1.4rem; color:var(--gray-400); z-index:1; }
+    .lead-dist-step:last-child::after { display:none; }
+    .lead-dist-step__icon { font-size:1.8rem; margin-bottom:10px; }
+    .lead-dist-step__tier { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:3px 10px; border-radius:var(--radius-full); display:inline-block; margin-bottom:8px; }
+    .lead-dist-step__tier--featured { background:#fef3c7; color:#92400e; }
+    .lead-dist-step__tier--premium  { background:var(--blue-50); color:var(--blue-700); }
+    .lead-dist-step__tier--basic    { background:var(--gray-100); color:var(--gray-600); }
+    .lead-dist-step__title { font-size:.88rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+    .lead-dist-step__desc  { font-size:.78rem; color:var(--gray-500); line-height:1.5; }
+    .lead-dist-step__time  { font-size:.72rem; font-weight:700; color:var(--amber); margin-top:6px; }
+
+    .lead-dist-step--featured { background:linear-gradient(135deg,#fffbeb,#fef3c7); border:1.5px solid #fcd34d; border-radius:var(--radius-lg); }
+    .lead-dist-step--premium  { background:linear-gradient(135deg,var(--blue-50),#eff6ff); border:1.5px solid #bfdbfe; border-radius:var(--radius-lg); }
+    .lead-dist-step--basic    { background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:var(--radius-lg); }
   </style>
 </head>
 <body>
@@ -128,9 +146,53 @@
         </div>
         <div class="provider-step">
           <div class="provider-step__dot">4</div>
-          <h3 class="provider-step__title">Contact & Convert</h3>
+          <h3 class="provider-step__title">Contact &amp; Convert</h3>
           <p class="provider-step__desc">Reach out, track the lead status, and measure your ROI in the dashboard.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lead Distribution Flow -->
+  <section class="section section--cream">
+    <div class="container">
+      <div class="section__header">
+        <p class="section__eyebrow">Lead Distribution System</p>
+        <h2 class="section__title">How Leads Reach You</h2>
+        <p class="section__subtitle">Your subscription tier determines when and how leads are distributed to you — higher tiers get earlier, exclusive access.</p>
+      </div>
+
+      <div class="lead-dist-flow">
+        <div class="lead-dist-step lead-dist-step--featured">
+          <div class="lead-dist-step__icon">🏆</div>
+          <div class="lead-dist-step__tier lead-dist-step__tier--featured">Featured</div>
+          <div class="lead-dist-step__title">First Access — Exclusive</div>
+          <div class="lead-dist-step__desc">Featured providers receive the lead immediately and have an exclusive 24-hour window. No other provider sees it during this time.</div>
+          <div class="lead-dist-step__time">Hour 0 → Hour 24 (exclusive)</div>
+        </div>
+        <div class="lead-dist-step lead-dist-step--premium">
+          <div class="lead-dist-step__icon">⭐</div>
+          <div class="lead-dist-step__tier lead-dist-step__tier--premium">Premium</div>
+          <div class="lead-dist-step__title">Second Access</div>
+          <div class="lead-dist-step__desc">If the Featured provider doesn't respond within 24 hours, the lead is shared with Premium providers who can then purchase it.</div>
+          <div class="lead-dist-step__time">After Hour 24</div>
+        </div>
+        <div class="lead-dist-step lead-dist-step--basic">
+          <div class="lead-dist-step__icon">📌</div>
+          <div class="lead-dist-step__tier lead-dist-step__tier--basic">Basic</div>
+          <div class="lead-dist-step__title">Open Access</div>
+          <div class="lead-dist-step__desc">Basic providers access leads after Premium providers. Leads remain available until the 3-buyer cap is reached.</div>
+          <div class="lead-dist-step__time">After Featured + Premium window</div>
+        </div>
+      </div>
+
+      <div style="background:var(--navy); border-radius:var(--radius-lg); padding:20px 28px; margin-top:24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <span style="font-size:1.3rem;">🔒</span>
+        <div>
+          <p style="color:#fff; font-weight:700; font-size:.9rem; margin-bottom:2px;">Max 3 providers per lead — guaranteed limited competition</p>
+          <p style="color:rgba(255,255,255,.6); font-size:.82rem;">Once 3 providers purchase a lead, it's closed. You're never competing with 20+ providers for the same family.</p>
+        </div>
+        <a href="#pricing" class="btn btn--white btn--sm" style="margin-left:auto; white-space:nowrap;">See Plans →</a>
       </div>
     </div>
   </section>
@@ -206,44 +268,48 @@
 
       <div class="pricing-grid">
         <div class="pricing-card">
-          <p class="pricing-card__name">Base</p>
+          <p class="pricing-card__name">Basic</p>
           <p class="pricing-card__price">$149<span>/month</span></p>
           <p class="pricing-card__coverage">📍 Coverage: 1 city</p>
           <ul class="pricing-card__features">
             <li class="pricing-card__feature"><span class="check">✓</span> Up to 10 leads/month</li>
-            <li class="pricing-card__feature"><span class="check">✓</span> Lead inbox & notifications</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Lead inbox &amp; notifications</li>
             <li class="pricing-card__feature"><span class="check">✓</span> Basic profile listing</li>
             <li class="pricing-card__feature"><span class="check">✓</span> Lead status tracking</li>
             <li class="pricing-card__feature"><span class="check">✓</span> Email support</li>
+            <li class="pricing-card__feature" style="color:var(--gray-400);">✗ Open access only (after Featured + Premium)</li>
           </ul>
           <a href="provider-dashboard.html" class="btn btn--secondary" style="text-align:center; width:100%;">Get Started</a>
         </div>
 
         <div class="pricing-card pricing-card--highlight">
           <p class="pricing-card__badge">⭐ Most Popular</p>
-          <p class="pricing-card__name">Professional</p>
+          <p class="pricing-card__name">Premium</p>
           <p class="pricing-card__price">$299<span>/month</span></p>
           <p class="pricing-card__coverage">📍 Coverage: City + radius or 3 cities</p>
           <ul class="pricing-card__features">
             <li class="pricing-card__feature"><span class="check">✓</span> Up to 20 leads/month</li>
-            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Base</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Basic</li>
             <li class="pricing-card__feature"><span class="check">✓</span> LQS + LIS scores visible</li>
             <li class="pricing-card__feature"><span class="check">✓</span> Priority placement in directory</li>
             <li class="pricing-card__feature"><span class="check">✓</span> ECM Verified badge</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Second access to leads (after Featured window)</li>
           </ul>
           <a href="provider-dashboard.html" class="btn btn--primary" style="text-align:center; width:100%;">Get Started</a>
         </div>
 
         <div class="pricing-card">
-          <p class="pricing-card__name">Premium</p>
+          <p class="pricing-card__badge" style="background:var(--amber-light); color:var(--amber);">🏆 First Access</p>
+          <p class="pricing-card__name">Featured</p>
           <p class="pricing-card__price" style="font-size:1.8rem;">Custom</p>
           <p class="pricing-card__coverage">📍 Coverage: State or multi-state</p>
           <ul class="pricing-card__features">
             <li class="pricing-card__feature"><span class="check">✓</span> Unlimited leads</li>
-            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Professional</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Everything in Premium</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> <strong>24-hour exclusive first access to leads</strong></li>
             <li class="pricing-card__feature"><span class="check">✓</span> Dedicated account manager</li>
-            <li class="pricing-card__feature"><span class="check">✓</span> CRM integration (coming soon)</li>
-            <li class="pricing-card__feature"><span class="check">✓</span> Featured provider badge</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Featured badge on profile &amp; directory</li>
+            <li class="pricing-card__feature"><span class="check">✓</span> Content engine access (publish articles)</li>
           </ul>
           <a href="#" class="btn btn--secondary" style="text-align:center; width:100%;" onclick="showToast('Our team will reach out within 24 hours.')">Contact Sales</a>
         </div>
