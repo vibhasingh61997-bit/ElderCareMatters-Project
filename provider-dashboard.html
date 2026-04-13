@@ -5,12 +5,224 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Provider Dashboard — ElderCareMatters</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Greeting bar ──────────────────────────────────────── */
+    .greeting-bar {
+      background: linear-gradient(135deg, var(--navy) 0%, #1d4ed8 100%);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .greeting-bar__left h1 { color:#fff; font-size:1.2rem; font-weight:800; margin-bottom:3px; }
+    .greeting-bar__left p  { color:rgba(255,255,255,.7); font-size:.85rem; }
+    .greeting-bar__right   { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .plan-chip {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.22);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .plan-chip__dot { width:8px; height:8px; background:#4ade80; border-radius:50%; flex-shrink:0; }
+
+    /* ── KPI stats row ─────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 20px 20px 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:3px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    .kpi-card--blue::before  { background: var(--blue-600); }
+    .kpi-card--green::before { background: var(--green-600); }
+    .kpi-card--amber::before { background: var(--amber); }
+    .kpi-card--teal::before  { background: var(--teal); }
+    .kpi-card__icon { font-size:1.4rem; margin-bottom:8px; }
+    .kpi-card__value { font-size:2rem; font-weight:800; color:var(--navy); line-height:1; margin-bottom:4px; }
+    .kpi-card__label { font-size:.76rem; color:var(--gray-500); font-weight:500; }
+    .kpi-card__delta {
+      display:inline-flex; align-items:center; gap:3px;
+      font-size:.7rem; font-weight:700;
+      margin-top:8px;
+      padding:2px 7px; border-radius:var(--radius-full);
+    }
+    .kpi-card__delta--up   { color:var(--green-600); background:var(--green-100); }
+    .kpi-card__delta--down { color:var(--red-700); background:var(--red-100); }
+    .kpi-card__delta--flat { color:var(--gray-500); background:var(--gray-100); }
+
+    /* ── Two-col layout ────────────────────────────────────── */
+    .dash-cols {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+
+    /* ── ROI card ──────────────────────────────────────────── */
+    .roi-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .roi-card__header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom: 20px;
+    }
+    .roi-card__title { font-size:.95rem; font-weight:700; color:var(--navy); }
+    .roi-card__period { font-size:.75rem; color:var(--gray-500); }
+    .roi-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .roi-metric { text-align:center; }
+    .roi-metric__value { font-size:1.5rem; font-weight:800; color:var(--navy); }
+    .roi-metric__value--green { color:var(--green-600); }
+    .roi-metric__value--blue  { color:var(--blue-600); }
+    .roi-metric__label { font-size:.72rem; color:var(--gray-500); margin-top:2px; line-height:1.3; }
+    .roi-divider { height:1px; background:var(--gray-100); margin:16px 0; }
+
+    /* Pipeline funnel */
+    .funnel-title { font-size:.8rem; font-weight:700; color:var(--gray-600); text-transform:uppercase; letter-spacing:.05em; margin-bottom:14px; }
+    .funnel-step {
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:10px;
+    }
+    .funnel-step__label { font-size:.8rem; color:var(--gray-600); width:100px; flex-shrink:0; }
+    .funnel-step__bar-track {
+      flex:1; height:10px; background:var(--gray-100);
+      border-radius:99px; overflow:hidden;
+    }
+    .funnel-step__bar-fill {
+      height:100%; border-radius:99px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .funnel-step__count { font-size:.8rem; font-weight:700; color:var(--gray-700); width:24px; text-align:right; flex-shrink:0; }
+    .funnel-step__pct   { font-size:.72rem; color:var(--gray-400); width:36px; text-align:right; flex-shrink:0; }
+    .funnel-fill--notify  { background: #60a5fa; }
+    .funnel-fill--purchase{ background: #2563eb; }
+    .funnel-fill--contact { background: var(--amber); }
+    .funnel-fill--convert { background: var(--green-600); }
+
+    /* ── Notification / Activity feed ─────────────────────── */
+    .notif-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .notif-card__header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .notif-card__title { font-size:.9rem; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:8px; }
+    .notif-badge {
+      background: var(--red-700); color:#fff;
+      font-size:.65rem; font-weight:800;
+      width:18px; height:18px; border-radius:50%;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+    .notif-card__mark-read { font-size:.75rem; color:var(--blue-600); cursor:pointer; font-weight:600; }
+    .notif-item {
+      display:flex; align-items:flex-start; gap:12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-50);
+      transition: background var(--transition);
+    }
+    .notif-item:last-child { border-bottom:none; }
+    .notif-item:hover { background:var(--gray-50); }
+    .notif-item--unread { background:var(--blue-50); }
+    .notif-item--unread:hover { background:#dbeafe; }
+    .notif-icon {
+      width:34px; height:34px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1rem; flex-shrink:0;
+    }
+    .notif-icon--lead    { background:#dbeafe; }
+    .notif-icon--convert { background:var(--green-100); }
+    .notif-icon--system  { background:var(--amber-light); }
+    .notif-icon--content { background:var(--teal-light); }
+    .notif-item__body { flex:1; min-width:0; }
+    .notif-item__text { font-size:.82rem; color:var(--gray-700); line-height:1.4; }
+    .notif-item__text strong { color:var(--navy); }
+    .notif-item__time { font-size:.72rem; color:var(--gray-400); margin-top:3px; }
+    .notif-dot {
+      width:7px; height:7px; background:var(--blue-600);
+      border-radius:50%; flex-shrink:0; margin-top:6px;
+    }
+
+    /* ── Recent leads mini-table ───────────────────────────── */
+    .section-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .section-header h2 { font-size:.95rem; font-weight:700; color:var(--gray-900); }
+    .section-header a  { font-size:.8rem; color:var(--blue-600); font-weight:600; }
+
+    /* ── Content promo ─────────────────────────────────────── */
+    .content-promo {
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      border-radius: var(--radius-lg);
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .content-promo__text h3 { color:#fff; font-size:1rem; font-weight:700; margin-bottom:4px; }
+    .content-promo__text p  { color:rgba(255,255,255,.75); font-size:.83rem; line-height:1.4; }
+    .btn-content-promo {
+      background:rgba(255,255,255,.18); color:#fff;
+      border:1.5px solid rgba(255,255,255,.3);
+      padding:9px 20px; border-radius:var(--radius);
+      font-size:.84rem; font-weight:700;
+      cursor:pointer; transition:all var(--transition);
+      white-space:nowrap; text-decoration:none; display:inline-block;
+    }
+    .btn-content-promo:hover { background:rgba(255,255,255,.28); }
+
+    @media (max-width: 900px) {
+      .kpi-row   { grid-template-columns: 1fr 1fr; }
+      .dash-cols { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 540px) {
+      .kpi-row { grid-template-columns: 1fr; }
+      .roi-metrics { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-  <span class="wf-label">Screen 4 · Provider Dashboard</span>
-
-  <!-- Thin top header for dashboard pages -->
   <header class="header">
     <div class="container header__inner">
       <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
@@ -21,10 +233,9 @@
     </div>
   </header>
 
-  <!-- Dashboard layout: sidebar + main -->
   <div class="dash-layout">
 
-    <!-- ── SIDEBAR ──────────────────────────────────────── -->
+    <!-- Sidebar -->
     <aside class="dash-sidebar">
       <div class="dash-sidebar__logo">ECM Provider</div>
       <a href="provider-dashboard.html" class="dash-sidebar__item active">
@@ -32,6 +243,9 @@
       </a>
       <a href="provider-leads.html" class="dash-sidebar__item">
         <span class="dash-sidebar__icon">📥</span> Lead Inbox
+      </a>
+      <a href="provider-content.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">✍️</span> My Content
       </a>
       <a href="provider-billing.html" class="dash-sidebar__item">
         <span class="dash-sidebar__icon">💳</span> Billing
@@ -44,128 +258,270 @@
       </a>
     </aside>
 
-    <!-- ── MAIN CONTENT ─────────────────────────────────── -->
+    <!-- Main -->
     <main class="dash-main">
 
-      <!-- Header row -->
-      <div class="dash-main__header">
-        <div>
-          <h1 class="dash-main__title">Dashboard</h1>
-          <p class="dash-main__subtitle">Welcome back, Sunrise Home Care · Austin, TX</p>
+      <!-- Greeting -->
+      <div class="greeting-bar">
+        <div class="greeting-bar__left">
+          <h1>Good morning, Sunrise Home Care</h1>
+          <p>Austin, TX · 5 new leads waiting in your inbox</p>
         </div>
-        <a href="provider-leads.html" class="btn btn--primary">Browse New Leads →</a>
-      </div>
-
-      <!-- Plan status bar -->
-      <div class="plan-bar">
-        <div>
-          <span class="plan-bar__name">Plan: Professional</span>
-          <span class="plan-bar__detail">· Renews May 8, 2026 · <strong>12 / 20</strong> leads used this month</span>
-        </div>
-        <a href="#" class="plan-bar__link">Manage Plan →</a>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <p class="stat-card__value">4</p>
-          <p class="stat-card__label">New Leads This Week</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-card__value">12</p>
-          <p class="stat-card__label">Leads This Month</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-card__value">9</p>
-          <p class="stat-card__label">Leads Purchased</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-card__value">3</p>
-          <p class="stat-card__label">Won / Converted</p>
+        <div class="greeting-bar__right">
+          <div class="plan-chip">
+            <div class="plan-chip__dot"></div>
+            Featured Plan
+          </div>
+          <a href="provider-leads.html" class="btn btn--primary btn--sm" style="background:rgba(255,255,255,.18); border:1.5px solid rgba(255,255,255,.3); color:#fff; font-weight:700;">Browse Leads →</a>
         </div>
       </div>
 
-      <!-- Recent leads table -->
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-        <h2 style="font-size:1rem; font-weight:700; color:var(--gray-900);">Recent Leads</h2>
-        <a href="provider-leads.html" style="font-size:.82rem; color:var(--blue-700); font-weight:600;">View All →</a>
+      <!-- KPI row -->
+      <div class="kpi-row">
+        <div class="kpi-card kpi-card--blue">
+          <div class="kpi-card__icon">📥</div>
+          <div class="kpi-card__value">5</div>
+          <div class="kpi-card__label">New Leads This Week</div>
+          <div class="kpi-card__delta kpi-card__delta--up">↑ 2 vs last week</div>
+        </div>
+        <div class="kpi-card kpi-card--green">
+          <div class="kpi-card__icon">🤝</div>
+          <div class="kpi-card__value">3</div>
+          <div class="kpi-card__label">Conversions This Month</div>
+          <div class="kpi-card__delta kpi-card__delta--up">↑ 1 vs last month</div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+          <div class="kpi-card__icon">💰</div>
+          <div class="kpi-card__value">$284</div>
+          <div class="kpi-card__label">Monthly Spend</div>
+          <div class="kpi-card__delta kpi-card__delta--flat">Same as last month</div>
+        </div>
+        <div class="kpi-card kpi-card--teal">
+          <div class="kpi-card__icon">📈</div>
+          <div class="kpi-card__value">$94</div>
+          <div class="kpi-card__label">Cost Per Acquisition</div>
+          <div class="kpi-card__delta kpi-card__delta--down">↓ $12 vs last month</div>
+        </div>
       </div>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Consumer</th>
-              <th>Care Type</th>
-              <th>Location</th>
-              <th>Urgency</th>
-              <th>LQS / LIS</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="td-name">Sarah M.</td>
-              <td>Home Care</td>
-              <td>Austin, TX</td>
-              <td>Urgent</td>
-              <td><span style="color:var(--green-600); font-weight:700;">88</span> / <span style="color:var(--blue-700); font-weight:700;">92</span></td>
-              <td><span class="badge badge--blue">New</span></td>
-            </tr>
-            <tr>
-              <td class="td-name">John D.</td>
-              <td>Assisted Living</td>
-              <td>Austin, TX</td>
-              <td>Within 1 month</td>
-              <td><span style="color:var(--green-600); font-weight:700;">74</span> / <span style="color:var(--blue-700); font-weight:700;">68</span></td>
-              <td><span class="badge badge--blue">New</span></td>
-            </tr>
-            <tr>
-              <td class="td-name">Maria K.</td>
-              <td>Memory Care</td>
-              <td>Round Rock, TX</td>
-              <td>Within 1 month</td>
-              <td><span style="color:var(--green-600); font-weight:700;">91</span> / <span style="color:var(--blue-700); font-weight:700;">80</span></td>
-              <td><span class="badge badge--yellow">Contacted</span></td>
-            </tr>
-            <tr>
-              <td class="td-name">Robert L.</td>
-              <td>Elder Law</td>
-              <td>Cedar Park, TX</td>
-              <td>Just researching</td>
-              <td><span style="color:var(--green-600); font-weight:700;">65</span> / <span style="color:var(--blue-700); font-weight:700;">40</span></td>
-              <td><span class="badge badge--green">Won</span></td>
-            </tr>
-            <tr>
-              <td class="td-name">Linda P.</td>
-              <td>Home Care</td>
-              <td>Austin, TX</td>
-              <td>1–3 months</td>
-              <td><span style="color:var(--green-600); font-weight:700;">70</span> / <span style="color:var(--blue-700); font-weight:700;">55</span></td>
-              <td><span class="badge badge--red">Lost</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- ROI + Notifications -->
+      <div class="dash-cols">
 
-      <!-- Billing snapshot -->
-      <div style="margin-top:28px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-        <div class="card">
-          <p style="font-size:.78rem; color:var(--gray-500); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px;">This Month's Spend</p>
-          <p style="font-size:1.8rem; font-weight:800; color:var(--gray-900);">$186</p>
-          <p style="font-size:.8rem; color:var(--gray-500); margin-top:2px;">$299 subscription + $0 extra leads</p>
+        <!-- Left: ROI & Funnel -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+          <div class="roi-card">
+            <div class="roi-card__header">
+              <span class="roi-card__title">ROI Summary</span>
+              <span class="roi-card__period">April 2026</span>
+            </div>
+            <div class="roi-metrics">
+              <div class="roi-metric">
+                <div class="roi-metric__value">$284</div>
+                <div class="roi-metric__label">Total Spend<br>(plan + leads)</div>
+              </div>
+              <div class="roi-metric">
+                <div class="roi-metric__value roi-metric__value--green">3</div>
+                <div class="roi-metric__label">Clients<br>Converted</div>
+              </div>
+              <div class="roi-metric">
+                <div class="roi-metric__value roi-metric__value--blue">$94</div>
+                <div class="roi-metric__label">Cost Per<br>Acquisition</div>
+              </div>
+            </div>
+            <div style="background:var(--blue-50); border:1px solid var(--blue-100); border-radius:var(--radius); padding:12px 14px; font-size:.82rem; color:var(--blue-700); line-height:1.5;">
+              💡 Each converted client averages <strong>$3,200/mo</strong>. At your current CPA of $94, you're generating approximately <strong>34× return</strong> on your ECM investment.
+            </div>
+
+            <div class="roi-divider"></div>
+
+            <div class="funnel-title">Lead Pipeline Funnel</div>
+
+            <div class="funnel-step">
+              <span class="funnel-step__label">Notified</span>
+              <div class="funnel-step__bar-track">
+                <div class="funnel-step__bar-fill funnel-fill--notify" style="width:100%"></div>
+              </div>
+              <span class="funnel-step__count">12</span>
+              <span class="funnel-step__pct">100%</span>
+            </div>
+            <div class="funnel-step">
+              <span class="funnel-step__label">Purchased</span>
+              <div class="funnel-step__bar-track">
+                <div class="funnel-step__bar-fill funnel-fill--purchase" style="width:75%"></div>
+              </div>
+              <span class="funnel-step__count">9</span>
+              <span class="funnel-step__pct">75%</span>
+            </div>
+            <div class="funnel-step">
+              <span class="funnel-step__label">Contacted</span>
+              <div class="funnel-step__bar-track">
+                <div class="funnel-step__bar-fill funnel-fill--contact" style="width:58%"></div>
+              </div>
+              <span class="funnel-step__count">7</span>
+              <span class="funnel-step__pct">58%</span>
+            </div>
+            <div class="funnel-step">
+              <span class="funnel-step__label">Converted</span>
+              <div class="funnel-step__bar-track">
+                <div class="funnel-step__bar-fill funnel-fill--convert" style="width:25%"></div>
+              </div>
+              <span class="funnel-step__count">3</span>
+              <span class="funnel-step__pct">25%</span>
+            </div>
+          </div>
+
+          <!-- Recent leads -->
+          <div>
+            <div class="section-header">
+              <h2>Recent Leads</h2>
+              <a href="provider-leads.html">View All →</a>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Consumer</th>
+                    <th>Care Type</th>
+                    <th>Location</th>
+                    <th>LQS / LIS</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="td-name">Patricia W.</td>
+                    <td>Home Care</td>
+                    <td>Austin, TX</td>
+                    <td><span style="color:var(--green-600); font-weight:700;">88</span> / <span style="color:var(--blue-700); font-weight:700;">94</span></td>
+                    <td><span class="badge badge--blue" style="background:var(--blue-100); color:var(--blue-700); border:1px solid #bfdbfe;">New</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-name">James R.</td>
+                    <td>Assisted Living</td>
+                    <td>Round Rock, TX</td>
+                    <td><span style="color:var(--green-600); font-weight:700;">79</span> / <span style="color:var(--blue-700); font-weight:700;">76</span></td>
+                    <td><span class="badge badge--blue" style="background:var(--blue-100); color:var(--blue-700); border:1px solid #bfdbfe;">New</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-name">Maria K.</td>
+                    <td>Memory Care</td>
+                    <td>Round Rock, TX</td>
+                    <td><span style="color:var(--green-600); font-weight:700;">91</span> / <span style="color:var(--blue-700); font-weight:700;">80</span></td>
+                    <td><span class="badge badge--yellow" style="background:var(--amber-light); color:var(--amber); border:1px solid #fcd34d;">Contacted</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-name">Sarah M.</td>
+                    <td>Home Care</td>
+                    <td>Austin, TX</td>
+                    <td><span style="color:var(--green-600); font-weight:700;">83</span> / <span style="color:var(--blue-700); font-weight:700;">71</span></td>
+                    <td><span class="badge badge--green" style="background:var(--green-100); color:var(--green-600); border:1px solid #86efac;">Won</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-name">Linda F.</td>
+                    <td>Hospice</td>
+                    <td>Georgetown, TX</td>
+                    <td><span style="color:var(--green-600); font-weight:700;">61</span> / <span style="color:var(--blue-700); font-weight:700;">38</span></td>
+                    <td><span class="badge badge--red" style="background:var(--red-100); color:var(--red-700); border:1px solid #fca5a5;">Lost</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
-        <div class="card">
-          <p style="font-size:.78rem; color:var(--gray-500); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px;">Lead Credits Remaining</p>
-          <p style="font-size:1.8rem; font-weight:800; color:var(--blue-700);">8</p>
-          <p style="font-size:.8rem; color:var(--gray-500); margin-top:2px;">Expires Jul 8, 2026</p>
+
+        <!-- Right: Notifications -->
+        <div class="notif-card">
+          <div class="notif-card__header">
+            <span class="notif-card__title">
+              Notifications
+              <span class="notif-badge">3</span>
+            </span>
+            <span class="notif-card__mark-read" onclick="markAllRead(this)">Mark all read</span>
+          </div>
+
+          <div class="notif-item notif-item--unread">
+            <div class="notif-icon notif-icon--lead">📥</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>New lead available</strong> — Urgent Home Care request in Austin, TX. Featured exclusive for 18h 42m.</div>
+              <div class="notif-item__time">38 minutes ago</div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+
+          <div class="notif-item notif-item--unread">
+            <div class="notif-icon notif-icon--lead">📥</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>New lead available</strong> — Assisted Living inquiry in Round Rock, TX. 1 slot already taken.</div>
+              <div class="notif-item__time">2 hours ago</div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+
+          <div class="notif-item notif-item--unread">
+            <div class="notif-icon notif-icon--convert">🤝</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>Conversion recorded</strong> — Sarah M. marked as won. Update your CRM to track ongoing care.</div>
+              <div class="notif-item__time">Yesterday at 3:12 PM</div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon notif-icon--content">✍️</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>Content tip</strong> — Publishing an article about "Home Care vs. Assisted Living" could drive 3× more profile views in Austin.</div>
+              <div class="notif-item__time">2 days ago</div>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon notif-icon--system">⚙️</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>Plan renews in 25 days</strong> — Your Featured plan renews on May 8, 2026. Billing card on file is valid.</div>
+              <div class="notif-item__time">3 days ago</div>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon notif-icon--lead">📥</div>
+            <div class="notif-item__body">
+              <div class="notif-item__text"><strong>Lead expired</strong> — Memory Care lead in Cedar Park, TX was claimed by other providers before you acted.</div>
+              <div class="notif-item__time">5 days ago</div>
+            </div>
+          </div>
+
         </div>
+
+      </div><!-- end dash-cols -->
+
+      <!-- Content engine promo -->
+      <div class="content-promo">
+        <div class="content-promo__text">
+          <h3>Boost your profile with content</h3>
+          <p>Providers who publish at least 2 articles per month receive 3× more profile views and rank higher in local search results.</p>
+        </div>
+        <a href="provider-content.html" class="btn-content-promo">Start Writing →</a>
       </div>
 
     </main>
-  </div><!-- end dash-layout -->
+  </div>
 
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
+  <script>
+    function markAllRead(btn) {
+      document.querySelectorAll('.notif-item--unread').forEach(function(el) {
+        el.classList.remove('notif-item--unread');
+      });
+      document.querySelectorAll('.notif-dot').forEach(function(el) { el.remove(); });
+      var badge = document.querySelector('.notif-badge');
+      if (badge) badge.remove();
+      btn.textContent = 'All read';
+      btn.style.color = 'var(--gray-400)';
+      btn.style.cursor = 'default';
+    }
+  </script>
 </body>
 </html>
