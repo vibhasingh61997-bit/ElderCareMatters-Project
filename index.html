@@ -616,32 +616,32 @@
       <div class="hp-hero__right">
         <div class="hero-match-label">Verified providers matched near you</div>
 
-        <div class="hero-card" onclick="selectServiceType('Home Care Agency')">
+        <div class="hero-card" onclick="navigateToCategoryPage('Home Care Agency')">
           <div class="hero-card__icon">🏠</div>
           <div class="hero-card__body">
             <div class="hero-card__name">Sunrise Home Care</div>
             <div class="hero-card__stars">★★★★★</div>
-            <div class="hero-card__meta">Austin, TX · Home Care Agency</div>
+            <div class="hero-card__meta" id="hero-card-meta-1">Home Care Agency</div>
           </div>
           <div class="hero-card__badge hero-card__badge--premium">🏆 Featured</div>
         </div>
 
-        <div class="hero-card" onclick="selectServiceType('Elder Law Attorney')">
+        <div class="hero-card" onclick="navigateToCategoryPage('Elder Law Attorney')">
           <div class="hero-card__icon">⚖️</div>
           <div class="hero-card__body">
-            <div class="hero-card__name">Austin Elder Law Group</div>
+            <div class="hero-card__name">Elder Law Group</div>
             <div class="hero-card__stars">★★★★★</div>
-            <div class="hero-card__meta">Austin, TX · Elder Law Attorney</div>
+            <div class="hero-card__meta" id="hero-card-meta-2">Elder Law Attorney</div>
           </div>
           <div class="hero-card__badge hero-card__badge--promoted">⭐ Premium</div>
         </div>
 
-        <div class="hero-card" onclick="selectServiceType('Memory Care Facility')">
+        <div class="hero-card" onclick="navigateToCategoryPage('Memory Care Facility')">
           <div class="hero-card__icon">🧠</div>
           <div class="hero-card__body">
-            <div class="hero-card__name">Lakewood Memory Care</div>
+            <div class="hero-card__name">Memory Care Center</div>
             <div class="hero-card__stars">★★★★☆</div>
-            <div class="hero-card__meta">Round Rock, TX · Memory Care</div>
+            <div class="hero-card__meta" id="hero-card-meta-3">Memory Care</div>
           </div>
           <div class="hero-card__badge hero-card__badge--basic">📌 Basic</div>
         </div>
@@ -723,37 +723,37 @@
   <section class="section section--cream" id="services">
     <div class="container">
       <div class="section__header">
-        <p class="section__eyebrow">Services We Match</p>
-        <h2 class="section__title">Browse by Care Type</h2>
-        <p class="section__subtitle">Select a category to instantly see verified providers in your area.</p>
+        <p class="section__eyebrow">One Need · One Location</p>
+        <h2 class="section__title">What Do You Need Help With?</h2>
+        <p class="section__subtitle">Select your care need — we'll show you verified providers near <span id="services-city-label">you</span>.</p>
       </div>
       <div class="services-grid">
-        <div class="service-card card--hover" data-type="Home Care Agency" onclick="selectServiceType('Home Care Agency')">
+        <div class="service-card card--hover" data-type="Home Care Agency" onclick="navigateToCategoryPage('Home Care Agency')">
           <span class="service-card__icon">🏠</span>
           <span class="service-card__label">Home Care</span>
           <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" data-type="Assisted Living" onclick="selectServiceType('Assisted Living')">
+        <div class="service-card card--hover" data-type="Assisted Living" onclick="navigateToCategoryPage('Assisted Living')">
           <span class="service-card__icon">🏡</span>
           <span class="service-card__label">Assisted Living</span>
           <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" data-type="Memory Care Facility" onclick="selectServiceType('Memory Care Facility')">
+        <div class="service-card card--hover" data-type="Memory Care Facility" onclick="navigateToCategoryPage('Memory Care Facility')">
           <span class="service-card__icon">🧠</span>
           <span class="service-card__label">Memory Care</span>
           <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" data-type="Elder Law Attorney" onclick="selectServiceType('Elder Law Attorney')">
+        <div class="service-card card--hover" data-type="Elder Law Attorney" onclick="navigateToCategoryPage('Elder Law Attorney')">
           <span class="service-card__icon">⚖️</span>
           <span class="service-card__label">Elder Law</span>
           <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" data-type="Care Manager" onclick="selectServiceType('Care Manager')">
+        <div class="service-card card--hover" data-type="Care Manager" onclick="navigateToCategoryPage('Care Manager')">
           <span class="service-card__icon">📋</span>
           <span class="service-card__label">Care Management</span>
           <span class="service-card__count">Loading…</span>
         </div>
-        <div class="service-card card--hover" data-type="Hospice Provider" onclick="selectServiceType('Hospice Provider')">
+        <div class="service-card card--hover" data-type="Hospice Provider" onclick="navigateToCategoryPage('Hospice Provider')">
           <span class="service-card__icon">🤝</span>
           <span class="service-card__label">Hospice</span>
           <span class="service-card__count">Loading…</span>
@@ -956,44 +956,31 @@
       document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
     });
 
-    /* ── Service card clicks show ALL providers of that type (no location filter) ── */
-    function selectServiceType(type) {
-      document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.service-card[data-type]').forEach(c => {
-        if (c.getAttribute('data-type') === type) c.classList.add('active');
-      });
-      var sel = document.getElementById('care-type-select');
-      if (sel) sel.value = type;
-      showAllProvidersOfType(type);
-    }
+    // Update hero card metas and "services-city-label" once location is known
+    // Called after initLocation() resolves (may be async from IP detection)
+    var _origSaveLocation = null;
+    document.addEventListener('DOMContentLoaded', function() {
+      // Patch saveLocation to also refresh hero card city labels
+      var _base = saveLocation;
+      window.saveLocation = function(cityState) {
+        _base(cityState);
+        refreshHeroLocationLabels();
+      };
+      // Initial refresh in case location was already saved
+      setTimeout(refreshHeroLocationLabels, 300);
+    });
 
-    function showAllProvidersOfType(type) {
-      var resultsSection = document.getElementById('search-results');
-      var grid = document.getElementById('provider-results-grid');
-      if (!resultsSection || !grid) return;
-
-      var all = (typeof PROVIDERS !== 'undefined') ? PROVIDERS : [];
-      var matched = type ? all.filter(function(p){ return p.type === type; }) : all;
-      matched = matched.sort(function(a,b){
-        var order = { featured:0, premium:1, promoted:2, basic:3, free:4 };
-        return (order[a.tier]||9) - (order[b.tier]||9);
-      });
-
-      var typeLabel = type ? type.replace(/ Agency| Facility| Attorney/g,'') : 'Care';
-      var eyebrow  = document.getElementById('results-eyebrow');
-      var title    = document.getElementById('results-title');
-      var subtitle = document.getElementById('results-subtitle');
-      var resFilt  = document.getElementById('results-type-filter');
-
-      if (eyebrow)  eyebrow.textContent  = 'All Locations';
-      if (title)    title.textContent    = matched.length + ' ' + typeLabel + ' Provider' + (matched.length !== 1 ? 's' : '') + ' Available';
-      if (subtitle) subtitle.textContent = 'Verified providers nationwide — use the location bar above to filter by your city.';
-      if (resFilt && type) resFilt.value = type;
-
-      renderProviderCards(matched, grid, 'nationwide', type || 'this care type');
-      resultsSection.style.display = 'block';
-      showToast('Showing all ' + matched.length + ' ' + typeLabel.toLowerCase() + ' providers');
-      setTimeout(function(){ resultsSection.scrollIntoView({ behavior:'smooth', block:'start' }); }, 100);
+    function refreshHeroLocationLabels() {
+      if (!currentLocation) return;
+      var city = currentLocation.city;
+      var m1 = document.getElementById('hero-card-meta-1');
+      var m2 = document.getElementById('hero-card-meta-2');
+      var m3 = document.getElementById('hero-card-meta-3');
+      if (m1) m1.textContent = city + ' · Home Care';
+      if (m2) m2.textContent = city + ' · Elder Law';
+      if (m3) m3.textContent = city + ' · Memory Care';
+      var sl = document.getElementById('services-city-label');
+      if (sl) sl.textContent = city;
     }
   </script>
 </body>

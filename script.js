@@ -146,8 +146,8 @@ const TYPE_ICONS = {
 };
 
 const TIER_CONFIG = {
-  premium:  { label:'🏆 Premium',  cls:'tier-badge--premium',  cardCls:'provider-card--premium' },
-  promoted: { label:'⭐ Promoted', cls:'tier-badge--promoted', cardCls:'provider-card--promoted' },
+  premium:  { label:'🏆 Featured', cls:'tier-badge--premium',  cardCls:'provider-card--premium' },
+  promoted: { label:'⭐ Premium',  cls:'tier-badge--promoted', cardCls:'provider-card--promoted' },
   basic:    { label:'📌 Basic',    cls:'tier-badge--basic',    cardCls:'' },
   free:     { label:'Free',        cls:'tier-badge--basic',    cardCls:'' },
 };
@@ -170,15 +170,32 @@ function initServiceCounts() {
 }
 
 
-/* ── AUTO-LOCATION ────────────────────────────────────────── */
+/* ── AUTO-LOCATION (IP-based) ─────────────────────────────── */
 
 let currentLocation = null;
 
 function initLocation() {
   try {
     const saved = localStorage.getItem('ecm_location');
-    if (saved) { currentLocation = JSON.parse(saved); updateLocationDisplay(); }
+    if (saved) {
+      currentLocation = JSON.parse(saved);
+      updateLocationDisplay();
+      return; // Already have a location, skip IP detection
+    }
   } catch(e) {}
+  // No saved location — auto-detect via IP
+  detectLocationByIP();
+}
+
+async function detectLocationByIP() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.city && data.region_code && !data.error) {
+      saveLocation(data.city + ', ' + data.region_code);
+    }
+  } catch(e) { /* IP geolocation unavailable — user can set manually */ }
 }
 
 function saveLocation(cityState) {
@@ -186,6 +203,8 @@ function saveLocation(cityState) {
   currentLocation = { cityState, city: parts[0], state: parts[1] || '' };
   try { localStorage.setItem('ecm_location', JSON.stringify(currentLocation)); } catch(e) {}
   updateLocationDisplay();
+  // Update chatbot location step if it's currently showing
+  refreshChatLocationStep();
 }
 
 function updateLocationDisplay() {
@@ -234,6 +253,19 @@ function applyLocation() {
 }
 
 
+/* ── CATEGORY NAVIGATION ─────────────────────────────────── */
+
+// Navigate to directory page filtered by type + current location
+function navigateToCategoryPage(type) {
+  const params = new URLSearchParams({ type });
+  if (currentLocation) {
+    params.set('city', currentLocation.city);
+    params.set('state', currentLocation.state);
+  }
+  window.location.href = 'directory.html?' + params.toString();
+}
+
+
 /* ── SEARCH ───────────────────────────────────────────────── */
 
 let _lastMatched = [];
@@ -277,7 +309,7 @@ function handleSearch() {
 
   if (eyebrow)  eyebrow.textContent  = '📍 ' + (locationLabel !== 'nationwide' ? locationLabel : 'Nationwide');
   if (title)    title.textContent    = matched.length ? matched.length + ' ' + typeLabel + ' Provider' + (matched.length!==1?'s':'') + ' Found' : 'No Providers Found';
-  if (subtitle) subtitle.textContent = matched.length ? 'Sorted by listing tier — Premium providers shown first.' : '';
+  if (subtitle) subtitle.textContent = matched.length ? 'Sorted by listing tier — Featured providers shown first.' : '';
 
   renderProviderCards(matched, grid, locationLabel, selectedType || 'this care type');
   resultsSection.style.display = 'block';
@@ -310,9 +342,9 @@ function renderProviderCards(providers, grid, locLabel, typeLabel) {
         <p class="empty-state__sub">We couldn't find ${typeLabel} providers in this area yet. Try changing your location or a different care type.</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
           <button class="btn btn--secondary" onclick="openLocationModal()">Change Location</button>
-          <a href="#chatbot-section" class="btn btn--primary"
-             onclick="document.getElementById('chatbot-section').scrollIntoView({behavior:'smooth'});return false;">
-            Request a Match →
+          <a href="#" class="btn btn--primary"
+             onclick="document.getElementById('chatbot').scrollIntoView({behavior:'smooth'});return false;">
+            Get Free Matches →
           </a>
         </div>
       </div>`;
@@ -352,13 +384,13 @@ function renderProviderCards(providers, grid, locLabel, typeLabel) {
 function requestMatch(name) {
   showToast('✅ Request sent to ' + name + '! They will contact you shortly.');
   setTimeout(() => {
-    const cb = document.getElementById('chatbot-section');
+    const cb = document.getElementById('chatbot');
     if (cb) cb.scrollIntoView({ behavior:'smooth' });
   }, 1200);
 }
 
 
-/* ── SERVICE CARD SELECTION ───────────────────────────────── */
+/* ── SERVICE CARD SELECTION (homepage inline results) ─────── */
 
 function selectServiceType(type) {
   document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
@@ -374,13 +406,36 @@ function selectService(name) { selectServiceType(name); }
 
 /* ── CHAT-STYLE INTAKE CHATBOT ────────────────────────────── */
 
+// Redesigned flow: type → who → urgency → confirm location → contact
 const CHAT_STEPS = [
-  { id:'who',     question:'Who needs care?',                       type:'options', opts:['A parent','A spouse','Myself','Another family member'] },
-  { id:'type',    question:'What type of care are you looking for?', type:'options', opts:['Home Care','Assisted Living','Memory Care','Elder Law Attorney','Care Management','Hospice','Not sure yet'] },
-  { id:'urgency', question:'How soon do you need help?',             type:'options', opts:['Urgent — within a week','Within a month','1–3 months','Just researching'] },
-  { id:'budget',  question:'What\'s your approximate monthly budget?', type:'options', opts:['Under $2,000','$2,000–$4,000','$4,000+','Prefer not to say'] },
-  { id:'zip',     question:'What ZIP code should we search?',        type:'zip',     placeholder:'e.g. 78701' },
-  { id:'contact', question:'Last step — where should we send your matches?', type:'contact' },
+  {
+    id:'type',
+    question:'What type of care are you looking for?',
+    type:'options',
+    opts:['Home Care','Assisted Living','Memory Care','Elder Law Attorney','Care Management','Hospice','Not sure yet']
+  },
+  {
+    id:'who',
+    question:'Who is this care for?',
+    type:'options',
+    opts:['A parent','A spouse','Myself','Another family member']
+  },
+  {
+    id:'urgency',
+    question:'How soon do you need help?',
+    type:'options',
+    opts:['Immediately','In 2–3 days','Within 1 week','Just researching']
+  },
+  {
+    id:'location',
+    question:'We\'ll match you with providers near:',
+    type:'location'
+  },
+  {
+    id:'contact',
+    question:'Last step — where should we send your matches?',
+    type:'contact'
+  },
 ];
 
 let chatStep    = 0;
@@ -394,6 +449,17 @@ function initChat() {
   chatAnswers = {};
   chatHistory = [];
   renderChatStep();
+}
+
+// Called when location updates while chatbot is on the location step
+function refreshChatLocationStep() {
+  if (chatStep !== 3) return; // only if we're on the location confirm step
+  const widget = document.getElementById('chatbot');
+  if (!widget) return;
+  const locDisplay = widget.querySelector('#chat-loc-display');
+  if (locDisplay && currentLocation) {
+    locDisplay.textContent = currentLocation.cityState;
+  }
 }
 
 function renderChatStep() {
@@ -421,6 +487,7 @@ function renderChatStep() {
   if (!inputArea) return;
   inputArea.innerHTML = '';
 
+  // ── Options ──
   if (step.type === 'options') {
     const wrap = document.createElement('div');
     wrap.className = 'chat-options';
@@ -440,53 +507,99 @@ function renderChatStep() {
     inputArea.appendChild(wrap);
   }
 
-  if (step.type === 'zip') {
-    const row = document.createElement('div');
-    row.className = 'chat-zip-row';
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.className = 'chat-text-input'; inp.placeholder = step.placeholder; inp.maxLength = 5;
-    // Pre-fill from saved location
-    if (currentLocation) {
-      const match = Object.entries(ZIP_CITIES).find(([z,cs]) => cs === currentLocation.cityState);
-      if (match) inp.value = match[0];
-    }
-    const btn = document.createElement('button');
-    btn.className = 'btn btn--primary btn--sm'; btn.textContent = 'Continue →';
-    btn.onclick = () => {
-      const z = inp.value.trim();
-      if (!/^\d{5}$/.test(z)) { inp.style.borderColor='#ef4444'; inp.focus(); return; }
-      chatAnswers.zip = z;
-      chatHistory.push({ role:'user', text: z + (ZIP_CITIES[z] ? ' (' + ZIP_CITIES[z] + ')' : '') });
-      if (ZIP_CITIES[z]) saveLocation(ZIP_CITIES[z]);
+  // ── Location confirm ──
+  if (step.type === 'location') {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;padding:14px 18px;';
+
+    const locBox = document.createElement('div');
+    locBox.style.cssText = 'display:flex;align-items:center;gap:10px;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:12px 14px;';
+
+    const pin = document.createElement('span');
+    pin.textContent = '📍';
+    pin.style.fontSize = '1.1rem';
+
+    const locText = document.createElement('strong');
+    locText.id = 'chat-loc-display';
+    locText.style.cssText = 'flex:1;color:var(--navy);font-size:.9rem;';
+    locText.textContent = currentLocation ? currentLocation.cityState : 'Location not detected yet…';
+
+    const changeBtn = document.createElement('button');
+    changeBtn.textContent = 'Change';
+    changeBtn.style.cssText = 'background:none;border:none;color:var(--blue-600);font-size:.8rem;cursor:pointer;font-family:inherit;text-decoration:underline;';
+    changeBtn.onclick = () => openLocationModal();
+
+    locBox.appendChild(pin);
+    locBox.appendChild(locText);
+    locBox.appendChild(changeBtn);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'btn btn--primary';
+    confirmBtn.style.width = '100%';
+    confirmBtn.textContent = 'Confirm Location →';
+    confirmBtn.onclick = () => {
+      const loc = currentLocation ? currentLocation.cityState : '';
+      if (!loc) { openLocationModal(); return; }
+      chatAnswers.location = loc;
+      chatHistory.push({ role:'user', text: '📍 ' + loc });
       chatStep++;
-      renderChatStep();
+      if (chatStep < CHAT_STEPS.length) renderChatStep();
+      else showChatDone(widget);
     };
-    inp.addEventListener('keydown', e => { if (e.key==='Enter') btn.click(); });
-    row.appendChild(inp); row.appendChild(btn);
-    inputArea.appendChild(row);
-    setTimeout(() => inp.focus(), 80);
+
+    wrap.appendChild(locBox);
+    wrap.appendChild(confirmBtn);
+    inputArea.appendChild(wrap);
   }
 
+  // ── Contact form ──
   if (step.type === 'contact') {
     const wrap = document.createElement('div');
     wrap.className = 'chat-contact-form';
-    const nameInp  = makeInput('text',  'Your name',         'chat-name');
-    const emailInp = makeInput('email', 'Email address',     'chat-email');
-    const note = document.createElement('p');
-    note.className = 'chat-privacy-note'; note.textContent = '🔒 Free for families. Your info is never sold.';
+
+    // Name row
+    const nameRow = document.createElement('div');
+    nameRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+    const firstInp = makeInput('text',  'First name',  'chat-firstname');
+    const lastInp  = makeInput('text',  'Last name',   'chat-lastname');
+    nameRow.appendChild(firstInp);
+    nameRow.appendChild(lastInp);
+
+    const emailInp = makeInput('email', 'Email address *', 'chat-email');
+
+    const phoneInp = makeInput('tel', 'Phone (optional — faster responses)', 'chat-phone');
+
+    const verifyNote = document.createElement('div');
+    verifyNote.style.cssText = 'background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius);padding:8px 12px;font-size:.75rem;color:#15803d;display:flex;align-items:center;gap:6px;';
+    verifyNote.innerHTML = '<span>✅</span><span>Get verified for faster responses — Email verified = faster · Phone verified = even faster</span>';
+
     const submitBtn = document.createElement('button');
-    submitBtn.className = 'btn btn--primary'; submitBtn.style.width = '100%';
+    submitBtn.className = 'btn btn--primary';
+    submitBtn.style.width = '100%';
     submitBtn.textContent = 'Get My Free Matches →';
     submitBtn.onclick = () => {
-      if (!nameInp.value.trim())       { nameInp.style.borderColor='#ef4444';  nameInp.focus();  return; }
-      if (!emailInp.value.includes('@')){ emailInp.style.borderColor='#ef4444'; emailInp.focus(); return; }
-      chatAnswers.name  = nameInp.value.trim();
-      chatAnswers.email = emailInp.value.trim();
+      if (!firstInp.value.trim())        { firstInp.style.borderColor='#ef4444';  firstInp.focus();  return; }
+      if (!emailInp.value.includes('@')) { emailInp.style.borderColor='#ef4444'; emailInp.focus(); return; }
+      chatAnswers.firstName = firstInp.value.trim();
+      chatAnswers.lastName  = lastInp.value.trim();
+      chatAnswers.name      = chatAnswers.firstName + (chatAnswers.lastName ? ' ' + chatAnswers.lastName : '');
+      chatAnswers.email     = emailInp.value.trim();
+      chatAnswers.phone     = phoneInp.value.trim();
       chatHistory.push({ role:'user', text: chatAnswers.name + ' · ' + chatAnswers.email });
       console.log('Lead captured:', chatAnswers);
       showChatDone(widget);
     };
-    wrap.appendChild(nameInp); wrap.appendChild(emailInp); wrap.appendChild(submitBtn); wrap.appendChild(note);
+
+    const privacyNote = document.createElement('p');
+    privacyNote.className = 'chat-privacy-note';
+    privacyNote.textContent = '🔒 Free for families. Your info is never sold.';
+
+    wrap.appendChild(nameRow);
+    wrap.appendChild(emailInp);
+    wrap.appendChild(phoneInp);
+    wrap.appendChild(verifyNote);
+    wrap.appendChild(submitBtn);
+    wrap.appendChild(privacyNote);
     inputArea.appendChild(wrap);
   }
 
@@ -525,15 +638,27 @@ function showChatDone(widget) {
   const ind  = widget.querySelector('.chat-widget__step-indicator');
   if (ind) ind.textContent = 'Complete ✓';
 
+  const locLabel   = currentLocation?.cityState || chatAnswers.location || 'your area';
+  const careType   = chatAnswers.type || '';
+  const crossSell  = getCrossSellSuggestion(careType);
+
   const body = widget.querySelector('.chat-widget__body');
   if (body) body.innerHTML = `
     <div class="chat-done">
       <div class="chat-done__icon">✅</div>
-      <h3 class="chat-done__title">You're all set, ${chatAnswers.name || 'there'}!</h3>
+      <h3 class="chat-done__title">You're all set, ${chatAnswers.firstName || 'there'}!</h3>
       <p class="chat-done__sub">
-        We've notified providers near <strong>${chatAnswers.zip && ZIP_CITIES[chatAnswers.zip] ? ZIP_CITIES[chatAnswers.zip] : (currentLocation?.cityState || 'your area')}</strong>.<br>
-        Expect to hear from up to 3 matched providers within 24 hours.
+        We've notified up to 3 verified providers near <strong>${locLabel}</strong>.<br>
+        Expect to hear back within 24 hours.
       </p>
+      ${crossSell ? `
+      <div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius);padding:14px 16px;margin-top:16px;text-align:left;">
+        <p style="font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:4px;">💡 You may also need…</p>
+        <p style="font-size:.8rem;color:var(--gray-600);margin-bottom:10px;">${crossSell.text}</p>
+        <button class="btn btn--secondary btn--sm" onclick="addCrossSellSearch('${crossSell.type}')">
+          Add ${crossSell.label} Search →
+        </button>
+      </div>` : ''}
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
         <a href="consumer-dashboard.html" class="btn btn--primary btn--sm">View My Dashboard →</a>
         <button class="btn btn--secondary btn--sm" onclick="initChat()">Start New Search</button>
@@ -541,6 +666,27 @@ function showChatDone(widget) {
     </div>`;
   const inputArea = widget.querySelector('.chat-widget__input');
   if (inputArea) inputArea.innerHTML = '';
+}
+
+function getCrossSellSuggestion(careType) {
+  const map = {
+    'Home Care':           { type:'Elder Law Attorney', label:'Elder Law',      text:'Many families also need legal guidance for Medicaid planning and power of attorney.' },
+    'Assisted Living':     { type:'Elder Law Attorney', label:'Elder Law',      text:'An elder law attorney can help with Medicaid applications and facility contracts.' },
+    'Memory Care':         { type:'Care Management',   label:'Care Management', text:'A geriatric care manager can coordinate your loved one\'s full care plan.' },
+    'Elder Law Attorney':  { type:'Home Care',         label:'Home Care',       text:'While arranging legal matters, many families also need in-home care support.' },
+    'Care Management':     { type:'Home Care',         label:'Home Care',       text:'Your care manager may recommend home care services as part of the care plan.' },
+    'Hospice':             { type:'Care Management',   label:'Care Management', text:'A care manager can help coordinate hospice care with other support services.' },
+  };
+  return map[careType] || null;
+}
+
+function addCrossSellSearch(type) {
+  // Re-start chatbot with the suggested type pre-filled
+  chatStep    = 1; // Skip to "who" — type is already known
+  chatAnswers = { type };
+  chatHistory = [{ role:'user', text: 'Looking for ' + type + ' in ' + (currentLocation?.cityState || 'your area') }];
+  const widget = document.getElementById('chatbot');
+  if (widget) renderChatStep();
 }
 
 

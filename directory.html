@@ -3,31 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Find Elder Care Providers — Browse by Location & Type | ElderCareMatters</title>
-  <meta name="description" content="Browse verified elder care providers by state, city, and care type. Find home care, assisted living, memory care, elder law attorneys, and more near you." />
+  <title>Find Elder Care Providers — ElderCareMatters</title>
+  <meta name="description" content="Find verified elder care providers in your city — home care, assisted living, memory care, elder law attorneys, and more. Free for families." />
   <link rel="stylesheet" href="style.css" />
   <style>
     /* ── Directory hero ── */
     .dir-hero {
-      background: var(--navy); padding: 64px 0 48px;
+      background: linear-gradient(135deg, #0f1f38 0%, #1a2f4e 50%, #0d3d38 100%);
+      padding: 64px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dir-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(13,148,136,.18) 0%, transparent 65%);
+      pointer-events: none;
     }
     .dir-hero__label {
       font-size: .75rem; text-transform: uppercase; letter-spacing: 1.2px;
-      color: var(--blue-100); font-weight: 700; margin-bottom: 12px;
+      color: #93c5fd; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dir-hero__label::before {
+      content: ''; display: inline-block;
+      width: 20px; height: 2px; background: #93c5fd; border-radius: 2px;
     }
     .dir-hero__title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-      color: var(--white); font-weight: 800; margin-bottom: 14px;
+      color: var(--white); font-weight: 800; margin-bottom: 14px; line-height: 1.2;
     }
     .dir-hero__title em { color: #93c5fd; font-style: italic; }
-    .dir-hero__sub { font-size: .95rem; color: var(--blue-100); max-width: 520px; margin-bottom: 28px; line-height: 1.7; }
+    .dir-hero__sub {
+      font-size: .95rem; color: rgba(255,255,255,.7); max-width: 520px;
+      margin-bottom: 28px; line-height: 1.7;
+    }
+    .dir-hero__loc-bar {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full); padding: 6px 14px;
+      font-size: .82rem; color: rgba(255,255,255,.8);
+      margin-bottom: 20px; cursor: pointer;
+    }
+    .dir-hero__loc-bar:hover { background: rgba(255,255,255,.16); }
+    .dir-hero__loc-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; flex-shrink: 0; }
 
     /* ── Hero search ── */
     .dir-search {
       display: flex; gap: 0; background: var(--white);
       border-radius: var(--radius-lg); overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,.2); max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.25); max-width: 600px;
     }
     .dir-search__input {
       flex: 1; border: none; outline: none; padding: 15px 18px;
@@ -45,8 +71,21 @@
       color: var(--white); border: none; padding: 15px 24px;
       font-size: .95rem; font-weight: 700; cursor: pointer;
       font-family: inherit; white-space: nowrap;
+      transition: opacity var(--transition);
     }
     .dir-search__btn:hover { opacity: .9; }
+
+    /* ── Category result header ── */
+    .cat-result-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 24px;
+    }
+    .cat-result-header__left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem; color: var(--navy); margin-bottom: 4px;
+    }
+    .cat-result-header__left p { font-size: .84rem; color: var(--gray-500); }
+    .cat-result-header__right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 
     /* ── Layout ── */
     .dir-layout {
@@ -65,9 +104,9 @@
     .dir-sidebar__list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 2px; }
     .dir-sidebar__item a {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 7px 10px; border-radius: var(--radius); font-size: .855rem;
+      padding: 8px 10px; border-radius: var(--radius); font-size: .855rem;
       color: var(--gray-700); text-decoration: none; font-weight: 500;
-      transition: all var(--transition);
+      transition: all var(--transition); cursor: pointer;
     }
     .dir-sidebar__item a:hover, .dir-sidebar__item a.active {
       background: var(--blue-50); color: var(--blue-700);
@@ -77,7 +116,16 @@
       border-radius: var(--radius-full); padding: 2px 7px; font-weight: 600;
     }
 
-    /* ── Category cards (Avvo-style) ── */
+    /* ── Match CTA box (sidebar) ── */
+    .match-cta-box {
+      background: linear-gradient(135deg, var(--navy), #0d3d38);
+      border-radius: var(--radius-lg); padding: 20px;
+      margin-bottom: 24px;
+    }
+    .match-cta-box p:first-child { font-size: .88rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .match-cta-box p:last-of-type { font-size: .78rem; color: rgba(255,255,255,.65); margin-bottom: 14px; line-height: 1.55; }
+
+    /* ── Category cards ── */
     .cat-cards {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;
     }
@@ -97,55 +145,29 @@
     .cat-card__desc { font-size: .8rem; color: var(--gray-500); line-height: 1.6; margin-bottom: 6px; }
     .cat-card__count { font-size: .75rem; color: var(--blue-600); font-weight: 700; }
 
-    /* ── State grid ── */
-    .state-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;
-    }
-    .state-btn {
+    /* ── Provider cards ── */
+    .provider-card {
       background: var(--white); border: 1px solid var(--gray-200);
-      border-radius: var(--radius); padding: 9px 14px;
-      font-size: .83rem; font-weight: 600; color: var(--navy);
-      cursor: pointer; transition: all var(--transition);
-      display: flex; justify-content: space-between; align-items: center;
-      text-decoration: none;
+      border-radius: var(--radius-lg); padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: all var(--transition); position: relative; overflow: hidden;
     }
-    .state-btn:hover { background: var(--blue-50); border-color: var(--blue-300); color: var(--blue-700); }
-    .state-btn__count { font-size: .72rem; color: var(--gray-400); font-weight: 500; }
+    .provider-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: var(--blue-100); }
+    .provider-card--premium  { border-color: #d97706; border-width: 2px; }
+    .provider-card--premium::before  { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #d97706, #f59e0b); }
+    .provider-card--promoted { border-color: var(--blue-200); }
+    .provider-card--promoted::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue-600), #38bdf8); }
+    .tier-badge { display: inline-flex; align-items: center; gap: 4px; font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; border-radius: var(--radius-full); padding: 3px 9px; }
+    .tier-badge--premium  { background: #fef3c7; color: #92400e; }
+    .tier-badge--promoted { background: var(--blue-50); color: var(--blue-700); }
+    .tier-badge--basic    { background: var(--gray-100); color: var(--gray-600); }
+    .ecm-badge { background: #dcfce7; color: #15803d; font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .empty-state { text-align: center; padding: 56px 24px; grid-column: 1/-1; }
+    .empty-state__icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state__title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 8px; }
+    .empty-state__sub { font-size: .9rem; color: var(--gray-500); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
 
-    /* ── City list ── */
-    .city-section { margin-bottom: 32px; }
-    .city-section__state {
-      font-size: .72rem; text-transform: uppercase; letter-spacing: 1px;
-      font-weight: 800; color: var(--gray-400); padding: 10px 0 6px;
-      border-bottom: 1px solid var(--gray-100); margin-bottom: 10px;
-    }
-    .city-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px;
-    }
-    .city-link {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 10px; border-radius: var(--radius);
-      text-decoration: none; font-size: .855rem; color: var(--gray-700);
-      font-weight: 500; transition: all var(--transition);
-    }
-    .city-link:hover { background: var(--blue-50); color: var(--blue-700); }
-    .city-link__count { margin-left: auto; font-size: .72rem; color: var(--gray-400); }
-
-    /* ── SEO URL structure callout ── */
-    .seo-paths {
-      background: var(--navy); border-radius: var(--radius-lg); padding: 28px 32px; margin-top: 40px;
-    }
-    .seo-paths h3 { color: var(--white); font-size: .9rem; font-weight: 700; margin-bottom: 14px; }
-    .seo-path-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
-    .seo-path {
-      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
-      border-radius: var(--radius); padding: 8px 12px;
-      font-size: .78rem; color: var(--blue-100); font-family: monospace;
-      text-decoration: none; transition: all var(--transition);
-    }
-    .seo-path:hover { background: rgba(255,255,255,.15); color: var(--white); }
-
-    /* Tabs */
+    /* ── Tabs ── */
     .dir-tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 2px solid var(--gray-100); }
     .dir-tab {
       padding: 10px 20px; font-size: .875rem; font-weight: 600; color: var(--gray-500);
@@ -156,6 +178,18 @@
     .dir-tab:hover { color: var(--navy); }
     .dir-tab-content { display: none; }
     .dir-tab-content.active { display: block; }
+
+    /* ── Get matched banner ── */
+    .get-matched-banner {
+      background: linear-gradient(135deg, var(--blue-600), #1e40af);
+      border-radius: var(--radius-lg); padding: 28px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 20px; margin-top: 36px;
+    }
+    .get-matched-banner h3 { color: #fff; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .get-matched-banner p { color: rgba(255,255,255,.75); font-size: .84rem; }
+    .btn--white-solid { background: #fff; color: var(--navy); padding: 12px 24px; border-radius: var(--radius-lg); font-size: .9rem; font-weight: 700; text-decoration: none; display: inline-block; transition: all var(--transition); }
+    .btn--white-solid:hover { background: #f0f9ff; transform: translateY(-1px); }
   </style>
 </head>
 <body>
@@ -167,30 +201,41 @@
         <a href="how-it-works.html">How It Works</a>
         <a href="directory.html" class="active">Find Care</a>
         <a href="blog.html">Resources</a>
+        <a href="for-providers.html">For Providers</a>
         <a href="provider-dashboard.html" class="btn btn--secondary btn--sm">Provider Login</a>
       </nav>
     </div>
   </header>
 
-  <!-- Hero search -->
+  <!-- Hero -->
   <section class="dir-hero">
     <div class="container">
-      <p class="dir-hero__label">📋 Provider Directory</p>
-      <h1 class="dir-hero__title">Find Elder Care Near <em>You</em></h1>
-      <p class="dir-hero__sub">Browse 500+ verified providers by location and care type. Every listing includes ratings, specialties, and ECM verification status.</p>
+      <p class="dir-hero__label">Provider Directory</p>
+      <!-- Title is updated dynamically by JS based on URL params + location -->
+      <h1 class="dir-hero__title" id="dir-hero-title">
+        Find <em id="dir-hero-type">Elder Care</em> Near <em id="dir-hero-city">You</em>
+      </h1>
+      <p class="dir-hero__sub" id="dir-hero-sub">Browse verified providers. Select a care type and we'll show you the best match in your area.</p>
+
+      <div class="dir-hero__loc-bar" onclick="openLocationModal()">
+        <span class="dir-hero__loc-dot"></span>
+        <span id="dir-loc-display">Detecting your location…</span>
+        <span style="color:rgba(255,255,255,.5);font-size:.75rem;margin-left:4px;">Change ›</span>
+      </div>
+
       <div class="dir-search">
         <input class="dir-search__input" id="dir-city-input" type="text" placeholder="City or ZIP code…" />
         <div class="dir-search__divider"></div>
         <select class="dir-search__select" id="dir-type-select">
           <option value="">All care types</option>
-          <option value="Home Care Agency">Home Care</option>
-          <option value="Assisted Living">Assisted Living</option>
-          <option value="Memory Care Facility">Memory Care</option>
-          <option value="Elder Law Attorney">Elder Law Attorney</option>
-          <option value="Care Manager">Care Management</option>
-          <option value="Hospice Provider">Hospice</option>
+          <option value="Home Care Agency">🏠 Home Care</option>
+          <option value="Assisted Living">🏡 Assisted Living</option>
+          <option value="Memory Care Facility">🧠 Memory Care</option>
+          <option value="Elder Law Attorney">⚖️ Elder Law Attorney</option>
+          <option value="Care Manager">📋 Care Management</option>
+          <option value="Hospice Provider">🤝 Hospice</option>
         </select>
-        <button class="dir-search__btn" onclick="dirSearch()">Search</button>
+        <button class="dir-search__btn" onclick="dirSearch()">Search →</button>
       </div>
     </div>
   </section>
@@ -202,7 +247,7 @@
       <div class="trust-stat__divider"></div>
       <div class="trust-stat"><span class="trust-stat__num">50+</span><span>cities covered</span></div>
       <div class="trust-stat__divider"></div>
-      <div class="trust-stat"><span class="trust-stat__num">6</span><span>care categories</span></div>
+      <div class="trust-stat"><span class="trust-stat__num">Max 3</span><span>providers per request</span></div>
       <div class="trust-stat__divider"></div>
       <div class="trust-stat"><span class="trust-stat__num">Free</span><span>for families</span></div>
     </div>
@@ -216,9 +261,16 @@
         <!-- LEFT SIDEBAR -->
         <aside class="dir-sidebar">
 
+          <!-- Get Matched CTA (top of sidebar) -->
+          <div class="match-cta-box">
+            <p>Need help choosing?</p>
+            <p>Our free care advisor matches you with the right provider in under 2 minutes.</p>
+            <a href="index.html#chatbot" class="btn btn--primary btn--sm" style="width:100%;text-align:center;display:block;">Get Free Matches →</a>
+          </div>
+
           <div class="dir-sidebar__section">
             <p class="dir-sidebar__title">Care Type</p>
-            <ul class="dir-sidebar__list">
+            <ul class="dir-sidebar__list" id="sidebar-type-list">
               <li class="dir-sidebar__item"><a href="#" onclick="filterDir('');return false;" class="active">All Types <span class="dir-sidebar__count">500+</span></a></li>
               <li class="dir-sidebar__item"><a href="#" onclick="filterDir('Home Care Agency');return false;">🏠 Home Care <span class="dir-sidebar__count">240+</span></a></li>
               <li class="dir-sidebar__item"><a href="#" onclick="filterDir('Assisted Living');return false;">🏡 Assisted Living <span class="dir-sidebar__count">95+</span></a></li>
@@ -232,24 +284,14 @@
           <div class="dir-sidebar__section">
             <p class="dir-sidebar__title">Top Cities</p>
             <ul class="dir-sidebar__list">
-              <li class="dir-sidebar__item"><a href="location-austin-tx.html">📍 Austin, TX <span class="dir-sidebar__count">18</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 New York, NY <span class="dir-sidebar__count">42</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Los Angeles, CA <span class="dir-sidebar__count">38</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Chicago, IL <span class="dir-sidebar__count">29</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Miami, FL <span class="dir-sidebar__count">24</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Houston, TX <span class="dir-sidebar__count">21</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Seattle, WA <span class="dir-sidebar__count">17</span></a></li>
-              <li class="dir-sidebar__item"><a href="#">📍 Boston, MA <span class="dir-sidebar__count">16</span></a></li>
-            </ul>
-          </div>
-
-          <div class="dir-sidebar__section">
-            <p class="dir-sidebar__title">Listing Tier</p>
-            <ul class="dir-sidebar__list">
-              <li class="dir-sidebar__item"><a href="#">🏆 Premium Listings</a></li>
-              <li class="dir-sidebar__item"><a href="#">⭐ Promoted Listings</a></li>
-              <li class="dir-sidebar__item"><a href="#">📌 Basic Listings</a></li>
-              <li class="dir-sidebar__item"><a href="#">All Listings</a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Austin&state=TX">📍 Austin, TX <span class="dir-sidebar__count">18</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=New+York&state=NY">📍 New York, NY <span class="dir-sidebar__count">42</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Los+Angeles&state=CA">📍 Los Angeles, CA <span class="dir-sidebar__count">38</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Chicago&state=IL">📍 Chicago, IL <span class="dir-sidebar__count">29</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Miami&state=FL">📍 Miami, FL <span class="dir-sidebar__count">24</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Houston&state=TX">📍 Houston, TX <span class="dir-sidebar__count">21</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Seattle&state=WA">📍 Seattle, WA <span class="dir-sidebar__count">17</span></a></li>
+              <li class="dir-sidebar__item"><a href="directory.html?city=Boston&state=MA">📍 Boston, MA <span class="dir-sidebar__count">16</span></a></li>
             </ul>
           </div>
 
@@ -264,102 +306,41 @@
         <!-- RIGHT MAIN CONTENT -->
         <div>
 
-          <!-- Tabs: Browse / By State / By Category -->
+          <!-- Tabs: Browse Results / By Category -->
           <div class="dir-tabs">
-            <button class="dir-tab active" onclick="switchTab('browse', this)">Browse All</button>
-            <button class="dir-tab" onclick="switchTab('bystate', this)">By State</button>
-            <button class="dir-tab" onclick="switchTab('bycat', this)">By Category</button>
+            <button class="dir-tab active" id="tab-btn-browse" onclick="switchTab('browse', this)">Browse Providers</button>
+            <button class="dir-tab" id="tab-btn-bycat" onclick="switchTab('bycat', this)">By Category</button>
           </div>
 
-          <!-- TAB: Browse All -->
+          <!-- TAB: Browse Results -->
           <div class="dir-tab-content active" id="tab-browse">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
-              <h2 style="font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--navy);">All Verified Providers</h2>
-              <span style="font-size:.82rem; color:var(--gray-400);" id="dir-count-label">Showing all 36 providers</span>
+            <div class="cat-result-header">
+              <div class="cat-result-header__left">
+                <h2 id="dir-results-title">All Verified Providers</h2>
+                <p id="dir-count-label">Loading providers…</p>
+              </div>
+              <div class="cat-result-header__right">
+                <button class="btn btn--secondary btn--sm" onclick="openLocationModal()">📍 Change Location</button>
+                <a href="index.html" class="btn btn--primary btn--sm">Get Matched Free →</a>
+              </div>
             </div>
             <div id="dir-provider-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px;"></div>
-          </div>
 
-          <!-- TAB: By State -->
-          <div class="dir-tab-content" id="tab-bystate">
-            <h2 style="font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--navy); margin-bottom:20px;">Browse by State</h2>
-            <div class="state-grid">
-              <a href="location-austin-tx.html" class="state-btn">Texas <span class="state-btn__count">60+</span></a>
-              <a href="#" class="state-btn">New York <span class="state-btn__count">50+</span></a>
-              <a href="#" class="state-btn">California <span class="state-btn__count">80+</span></a>
-              <a href="#" class="state-btn">Florida <span class="state-btn__count">55+</span></a>
-              <a href="#" class="state-btn">Illinois <span class="state-btn__count">35+</span></a>
-              <a href="#" class="state-btn">Pennsylvania <span class="state-btn__count">28+</span></a>
-              <a href="#" class="state-btn">Georgia <span class="state-btn__count">22+</span></a>
-              <a href="#" class="state-btn">Arizona <span class="state-btn__count">18+</span></a>
-              <a href="#" class="state-btn">Washington <span class="state-btn__count">20+</span></a>
-              <a href="#" class="state-btn">Massachusetts <span class="state-btn__count">24+</span></a>
-              <a href="#" class="state-btn">Colorado <span class="state-btn__count">16+</span></a>
-              <a href="#" class="state-btn">Nevada <span class="state-btn__count">14+</span></a>
-              <a href="#" class="state-btn">North Carolina <span class="state-btn__count">18+</span></a>
-              <a href="#" class="state-btn">Ohio <span class="state-btn__count">22+</span></a>
-              <a href="#" class="state-btn">Michigan <span class="state-btn__count">19+</span></a>
-              <a href="#" class="state-btn">Virginia <span class="state-btn__count">17+</span></a>
-            </div>
-
-            <div style="margin-top:36px;">
-              <h3 style="font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--navy); margin-bottom:18px;">Featured Cities</h3>
-              <div class="city-section">
-                <div class="city-section__state">Texas</div>
-                <div class="city-grid">
-                  <a href="location-austin-tx.html" class="city-link">📍 Austin <span class="city-link__count">18 providers</span></a>
-                  <a href="#" class="city-link">📍 Houston <span class="city-link__count">21 providers</span></a>
-                  <a href="#" class="city-link">📍 Dallas <span class="city-link__count">19 providers</span></a>
-                  <a href="#" class="city-link">📍 San Antonio <span class="city-link__count">12 providers</span></a>
-                </div>
+            <!-- Bottom CTA -->
+            <div class="get-matched-banner">
+              <div>
+                <h3>Not sure which provider is right for you?</h3>
+                <p>Our free care advisor matches you with up to 3 verified providers in your area — in under 2 minutes.</p>
               </div>
-              <div class="city-section">
-                <div class="city-section__state">New York</div>
-                <div class="city-grid">
-                  <a href="#" class="city-link">📍 New York City <span class="city-link__count">42 providers</span></a>
-                  <a href="#" class="city-link">📍 Brooklyn <span class="city-link__count">14 providers</span></a>
-                  <a href="#" class="city-link">📍 Queens <span class="city-link__count">11 providers</span></a>
-                </div>
-              </div>
-              <div class="city-section">
-                <div class="city-section__state">California</div>
-                <div class="city-grid">
-                  <a href="#" class="city-link">📍 Los Angeles <span class="city-link__count">38 providers</span></a>
-                  <a href="#" class="city-link">📍 San Francisco <span class="city-link__count">22 providers</span></a>
-                  <a href="#" class="city-link">📍 San Diego <span class="city-link__count">16 providers</span></a>
-                </div>
-              </div>
-              <div class="city-section">
-                <div class="city-section__state">Florida</div>
-                <div class="city-grid">
-                  <a href="#" class="city-link">📍 Miami <span class="city-link__count">24 providers</span></a>
-                  <a href="#" class="city-link">📍 Orlando <span class="city-link__count">14 providers</span></a>
-                  <a href="#" class="city-link">📍 Tampa <span class="city-link__count">17 providers</span></a>
-                </div>
-              </div>
-            </div>
-
-            <!-- SEO URL structure -->
-            <div class="seo-paths">
-              <h3>Browse by Location + Care Type</h3>
-              <div class="seo-path-grid">
-                <a href="location-austin-tx.html" class="seo-path">/texas/austin/home-care</a>
-                <a href="location-austin-tx.html" class="seo-path">/texas/austin/elder-law</a>
-                <a href="location-austin-tx.html" class="seo-path">/texas/austin/memory-care</a>
-                <a href="#" class="seo-path">/texas/houston/home-care</a>
-                <a href="#" class="seo-path">/new-york/nyc/elder-law</a>
-                <a href="#" class="seo-path">/california/los-angeles/home-care</a>
-                <a href="#" class="seo-path">/florida/miami/assisted-living</a>
-                <a href="#" class="seo-path">/illinois/chicago/elder-law</a>
-              </div>
+              <a href="index.html" class="btn--white-solid">Start Free Match →</a>
             </div>
           </div>
 
           <!-- TAB: By Category -->
           <div class="dir-tab-content" id="tab-bycat">
-            <h2 style="font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--navy); margin-bottom:20px;">Browse by Care Type</h2>
+            <p style="font-size:.84rem;color:var(--gray-500);margin-bottom:20px;">Select a care type to see verified providers in <span id="bycat-city-label">your area</span>.</p>
             <div class="cat-cards">
-              <div class="cat-card" onclick="filterDir('Home Care Agency'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Home Care Agency')">
                 <div class="cat-card__icon">🏠</div>
                 <div>
                   <p class="cat-card__name">Home Care</p>
@@ -367,7 +348,7 @@
                   <p class="cat-card__count">240+ providers nationwide</p>
                 </div>
               </div>
-              <div class="cat-card" onclick="filterDir('Assisted Living'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Assisted Living')">
                 <div class="cat-card__icon">🏡</div>
                 <div>
                   <p class="cat-card__name">Assisted Living</p>
@@ -375,7 +356,7 @@
                   <p class="cat-card__count">95+ facilities nationwide</p>
                 </div>
               </div>
-              <div class="cat-card" onclick="filterDir('Memory Care Facility'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Memory Care Facility')">
                 <div class="cat-card__icon">🧠</div>
                 <div>
                   <p class="cat-card__name">Memory Care</p>
@@ -383,7 +364,7 @@
                   <p class="cat-card__count">68+ facilities nationwide</p>
                 </div>
               </div>
-              <div class="cat-card" onclick="filterDir('Elder Law Attorney'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Elder Law Attorney')">
                 <div class="cat-card__icon">⚖️</div>
                 <div>
                   <p class="cat-card__name">Elder Law Attorneys</p>
@@ -391,7 +372,7 @@
                   <p class="cat-card__count">120+ attorneys nationwide</p>
                 </div>
               </div>
-              <div class="cat-card" onclick="filterDir('Care Manager'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Care Manager')">
                 <div class="cat-card__icon">📋</div>
                 <div>
                   <p class="cat-card__name">Care Management</p>
@@ -399,7 +380,7 @@
                   <p class="cat-card__count">80+ managers nationwide</p>
                 </div>
               </div>
-              <div class="cat-card" onclick="filterDir('Hospice Provider'); switchTabById('browse');">
+              <div class="cat-card" onclick="filterDirAndBrowse('Hospice Provider')">
                 <div class="cat-card__icon">🤝</div>
                 <div>
                   <p class="cat-card__name">Hospice Care</p>
@@ -415,39 +396,65 @@
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="cta-banner">
-    <div class="container cta-banner__inner">
-      <div>
-        <h2 class="cta-banner__title">Can't find what you need?</h2>
-        <p class="cta-banner__subtitle">Our free matching service will connect you with the right provider. Takes under 2 minutes.</p>
+  <!-- Location Modal (shared from script.js) -->
+  <div class="loc-modal-overlay" id="loc-modal-overlay" onclick="handleModalOverlayClick(event)">
+    <div class="loc-modal">
+      <h2 class="loc-modal__title">Set your location</h2>
+      <p class="loc-modal__sub">Searching for a parent in a different city? Enter their location.</p>
+      <input class="loc-modal__input" id="loc-zip-input" type="text" placeholder="ZIP code (e.g. 78701)" maxlength="5" />
+      <div class="loc-modal__or">— or —</div>
+      <input class="loc-modal__input" id="loc-city-input" type="text" placeholder="City name (e.g. Austin)" />
+      <select class="loc-modal__state" id="loc-state-select">
+        <option value="">Select state…</option>
+        <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+        <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+        <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+        <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+        <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+        <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+        <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+        <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+        <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+        <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+        <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+        <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+        <option>WI</option><option>WY</option>
+      </select>
+      <div class="loc-modal__actions">
+        <button class="loc-modal__cancel" onclick="closeLocationModal()">Cancel</button>
+        <button class="btn btn--primary" style="flex:1;" onclick="applyDirLocation()">Update Location</button>
       </div>
-      <a href="index.html#chatbot-section" class="btn btn--white btn--lg">Start Free Match →</a>
     </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      <div class="footer__top">
-        <div>
-          <p class="footer__brand">ElderCareMatters</p>
-          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States.</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;"><span class="footer__badge">✓ Verified Providers</span><span class="footer__badge">🔒 Privacy Protected</span></div>
-        </div>
-        <div><p class="footer__col-title">For Families</p><div class="footer__col-links"><a href="how-it-works.html">How It Works</a><a href="directory.html">Find Care</a><a href="blog.html">Resources & Guides</a><a href="consumer-dashboard.html">My Care Request</a></div></div>
-        <div><p class="footer__col-title">Browse by City</p><div class="footer__col-links"><a href="location-austin-tx.html">Austin, TX</a><a href="#">New York, NY</a><a href="#">Los Angeles, CA</a><a href="directory.html">All Locations →</a></div></div>
-        <div><p class="footer__col-title">Company</p><div class="footer__col-links"><a href="#">About Us</a><a href="#">Contact</a><a href="for-providers.html">For Providers</a><a href="#">Privacy Policy</a></div></div>
-      </div>
-      <div class="footer__bottom"><p>© 2026 ElderCareMatters. All rights reserved.</p><p>Free for families · Verified providers · No spam</p></div>
-    </div>
-  </footer>
+  </div>
 
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
+  <style>
+    /* Location modal styles (shared pattern from index) */
+    .loc-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s; }
+    .loc-modal-overlay.open { opacity:1;pointer-events:all; }
+    .loc-modal { background:var(--white);border-radius:var(--radius-xl);padding:32px;width:90%;max-width:420px;box-shadow:0 25px 60px rgba(0,0,0,.2);transform:translateY(12px);transition:transform .2s; }
+    .loc-modal-overlay.open .loc-modal { transform:translateY(0); }
+    .loc-modal__title { font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);margin-bottom:6px; }
+    .loc-modal__sub { font-size:.83rem;color:var(--gray-500);margin-bottom:20px; }
+    .loc-modal__input,.loc-modal__state { width:100%;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;transition:border-color var(--transition); }
+    .loc-modal__input:focus,.loc-modal__state:focus { border-color:var(--blue-600); }
+    .loc-modal__or { text-align:center;color:var(--gray-400);font-size:.78rem;margin:10px 0; }
+    .loc-modal__actions { display:flex;gap:10px;margin-top:6px; }
+    .loc-modal__cancel { background:none;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:10px 18px;font-size:.875rem;cursor:pointer;font-family:inherit;color:var(--gray-600); }
+  </style>
   <script>
     window.addEventListener('scroll', () => {
       document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
     });
+
+    /* ────────────────────────────────────────────────────────
+       DIRECTORY PAGE LOGIC
+    ──────────────────────────────────────────────────────── */
+
+    let _activeDirType = '';
+    let _activeDirCity = '';
+    let _activeDirState = '';
 
     // Tab switching
     function switchTab(id, btn) {
@@ -456,25 +463,53 @@
       btn.classList.add('active');
       document.getElementById('tab-' + id).classList.add('active');
     }
-    function switchTabById(id) {
-      const btns = document.querySelectorAll('.dir-tab');
-      const tabs = ['browse','bystate','bycat'];
-      const idx = tabs.indexOf(id);
-      if (idx >= 0 && btns[idx]) switchTab(id, btns[idx]);
+
+    // Click a category card → filter + switch to browse tab
+    function filterDirAndBrowse(type) {
+      _activeDirType = type;
+      highlightSidebarType(type);
+      renderDirGrid();
+      switchTab('browse', document.getElementById('tab-btn-browse'));
     }
 
     // Sidebar filter
-    let _activeDirType = '';
     function filterDir(type) {
       _activeDirType = type;
-      document.querySelectorAll('.dir-sidebar__item a').forEach(a => a.classList.remove('active'));
-      // Highlight matching sidebar link
-      document.querySelectorAll('.dir-sidebar__item a').forEach(a => {
+      highlightSidebarType(type);
+      updateDirHeroTitle();
+      renderDirGrid();
+    }
+
+    function highlightSidebarType(type) {
+      document.querySelectorAll('#sidebar-type-list .dir-sidebar__item a').forEach(a => {
+        a.classList.remove('active');
         const txt = a.textContent.trim();
         if (!type && txt.startsWith('All')) a.classList.add('active');
         else if (type && txt.includes(type.replace(' Agency','').replace(' Facility','').replace(' Attorney',''))) a.classList.add('active');
       });
-      renderDirGrid();
+    }
+
+    function updateDirHeroTitle() {
+      const typeEl  = document.getElementById('dir-hero-type');
+      const cityEl  = document.getElementById('dir-hero-city');
+      const titleEl = document.getElementById('dir-results-title');
+      const subEl   = document.getElementById('dir-hero-sub');
+
+      const typeLabel = _activeDirType
+        ? _activeDirType.replace(' Agency','').replace(' Facility','').replace(' Attorney','')
+        : 'Elder Care';
+      const cityLabel = _activeDirCity || currentLocation?.city || '';
+      const stateLabel = _activeDirState || currentLocation?.state || '';
+      const locationLabel = cityLabel && stateLabel ? cityLabel + ', ' + stateLabel : (cityLabel || 'Your Area');
+
+      if (typeEl)  typeEl.textContent  = typeLabel;
+      if (cityEl)  cityEl.textContent  = locationLabel;
+      if (titleEl) titleEl.textContent = (_activeDirType ? typeLabel + ' Providers' : 'All Providers') + (cityLabel ? ' in ' + locationLabel : '');
+      if (subEl)   subEl.textContent   = 'Verified, pre-screened providers' + (cityLabel ? ' in ' + locationLabel : ' near you') + '. Free for families — no obligation.';
+
+      // Update "By Category" city label
+      const bycatCity = document.getElementById('bycat-city-label');
+      if (bycatCity) bycatCity.textContent = cityLabel || 'your area';
     }
 
     function renderDirGrid() {
@@ -482,22 +517,61 @@
       const countLabel = document.getElementById('dir-count-label');
       if (!grid) return;
 
-      let list = (typeof PROVIDERS !== 'undefined' ? PROVIDERS : []);
+      let list = (typeof PROVIDERS !== 'undefined' ? [...PROVIDERS] : []);
+
+      // Filter by city/state if set
+      if (_activeDirCity && _activeDirState) {
+        list = list.filter(p => p.city === _activeDirCity && p.state === _activeDirState);
+        if (!list.length) {
+          // Fallback: state only
+          list = (typeof PROVIDERS !== 'undefined' ? [...PROVIDERS] : []);
+          list = list.filter(p => p.state === _activeDirState);
+        }
+      } else if (_activeDirCity) {
+        list = list.filter(p => p.city === _activeDirCity);
+      } else if (currentLocation) {
+        // Use saved/detected location if no URL param
+        const city = currentLocation.city;
+        const state = currentLocation.state;
+        let loc = list.filter(p => p.city === city && p.state === state);
+        if (loc.length) { list = loc; }
+        else {
+          loc = list.filter(p => p.state === state);
+          if (loc.length) list = loc;
+        }
+      }
+
+      // Filter by type
       if (_activeDirType) list = list.filter(p => p.type === _activeDirType);
 
-      // Sort: premium → promoted → basic → free
+      // Sort by tier
       const tierOrder = { premium:0, promoted:1, basic:2, free:3 };
-      list = list.sort((a,b) => (tierOrder[a.tier]??9) - (tierOrder[b.tier]??9));
+      list.sort((a,b) => (tierOrder[a.tier]??9) - (tierOrder[b.tier]??9));
 
-      if (countLabel) countLabel.textContent = `Showing ${list.length} provider${list.length!==1?'s':''}`;
+      const locLabel = (_activeDirCity || currentLocation?.city) ? ((_activeDirCity || currentLocation.city) + ((_activeDirState || currentLocation?.state) ? ', ' + (_activeDirState || currentLocation.state) : '')) : 'nationwide';
+      if (countLabel) countLabel.textContent = list.length + ' provider' + (list.length!==1?'s':'') + ' in ' + locLabel;
 
       const TIER_CFG = {
-        premium:  { label:'🏆 Premium',  cardCls:'provider-card--premium',  badgeCls:'tier-badge--premium' },
-        promoted: { label:'⭐ Promoted', cardCls:'provider-card--promoted', badgeCls:'tier-badge--promoted' },
+        premium:  { label:'🏆 Featured', cardCls:'provider-card--premium',  badgeCls:'tier-badge--premium' },
+        promoted: { label:'⭐ Premium',  cardCls:'provider-card--promoted', badgeCls:'tier-badge--promoted' },
         basic:    { label:'📌 Basic',    cardCls:'',                        badgeCls:'tier-badge--basic' },
         free:     { label:'Free',        cardCls:'',                        badgeCls:'tier-badge--basic' },
       };
       const TYPE_IC = { 'Home Care Agency':'🏠','Elder Law Attorney':'⚖️','Care Manager':'📋','Memory Care Facility':'🧠','Assisted Living':'🏡','Hospice Provider':'🤝' };
+
+      if (!list.length) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">🔍</div>
+            <h3 class="empty-state__title">No providers found in ${locLabel}</h3>
+            <p class="empty-state__sub">Try a nearby city or use our free matching service — we'll find the right provider for you.</p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn btn--secondary" onclick="openLocationModal()">Change Location</button>
+              <a href="index.html" class="btn btn--primary">Get Free Matches →</a>
+            </div>
+          </div>`;
+        return;
+      }
 
       grid.innerHTML = list.map(p => {
         const t = TIER_CFG[p.tier] || TIER_CFG.basic;
@@ -517,37 +591,148 @@
             <div style="display:flex;align-items:center;gap:6px;">
               <span style="color:#f59e0b;font-size:.85rem;">${stars}</span>
               <span style="font-size:.8rem;font-weight:700;color:var(--gray-700);">${p.rating}</span>
-              <span style="font-size:.75rem;color:var(--gray-400);">(${p.reviews})</span>
+              <span style="font-size:.75rem;color:var(--gray-400);">(${p.reviews} reviews)</span>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:5px;">
               ${p.specialties.slice(0,2).map(s=>`<span style="background:var(--blue-50);color:var(--blue-700);font-size:.7rem;font-weight:600;padding:2px 9px;border-radius:20px;">${s}</span>`).join('')}
             </div>
             <button class="btn btn--primary btn--sm" style="margin-top:4px;align-self:flex-start;"
-              onclick="showToast('Request sent to ${p.name.replace(/'/g,"\\'")}! They will contact you shortly.')">
+              onclick="showToast('✅ Request sent to ${p.name.replace(/'/g,"\\'")}! They\'ll contact you shortly.')">
               Request Info →
             </button>
           </div>`;
       }).join('');
     }
 
-    // Directory search
+    // Directory search bar
     function dirSearch() {
-      const city = document.getElementById('dir-city-input').value.trim();
+      const cityInput = document.getElementById('dir-city-input').value.trim();
       const type = document.getElementById('dir-type-select').value;
-      if (city) {
-        // Try to save the location and redirect to homepage search
-        window.location.href = 'index.html';
-        return;
+
+      if (cityInput) {
+        // Try ZIP first
+        if (/^\d{5}$/.test(cityInput) && typeof ZIP_CITIES !== 'undefined' && ZIP_CITIES[cityInput]) {
+          const cs = ZIP_CITIES[cityInput].split(', ');
+          _activeDirCity = cs[0];
+          _activeDirState = cs[1] || '';
+          saveLocation(ZIP_CITIES[cityInput]);
+        } else {
+          // Try city name alias
+          const alias = typeof CITY_ALIASES !== 'undefined' ? CITY_ALIASES[cityInput.toLowerCase()] : null;
+          const cityName = alias || (cityInput.charAt(0).toUpperCase() + cityInput.slice(1));
+          const match = typeof PROVIDERS !== 'undefined' ? PROVIDERS.find(p => p.city === cityName) : null;
+          if (match) {
+            _activeDirCity = match.city;
+            _activeDirState = match.state;
+            saveLocation(match.city + ', ' + match.state);
+          } else {
+            _activeDirCity = cityName;
+            _activeDirState = '';
+          }
+        }
       }
-      if (type) filterDir(type);
-      switchTabById('browse');
+      if (type) _activeDirType = type;
+
+      updateDirHeroTitle();
+      renderDirGrid();
+      switchTab('browse', document.getElementById('tab-btn-browse'));
+      highlightSidebarType(_activeDirType);
     }
 
-    // Expose PROVIDERS globally for directory page
+    // Apply location from modal and refresh directory
+    function applyDirLocation() {
+      applyLocation(); // from script.js
+      setTimeout(() => {
+        if (currentLocation) {
+          _activeDirCity = currentLocation.city;
+          _activeDirState = currentLocation.state;
+          updateDirHeroTitle();
+          renderDirGrid();
+          updateDirLocDisplay();
+        }
+        closeLocationModal();
+      }, 100);
+    }
+
+    function updateDirLocDisplay() {
+      const disp = document.getElementById('dir-loc-display');
+      if (disp && currentLocation) disp.textContent = currentLocation.cityState;
+    }
+
+    // Read URL params on load and initialize directory
     document.addEventListener('DOMContentLoaded', () => {
-      // Wait for script.js to load PROVIDERS
-      setTimeout(() => renderDirGrid(), 100);
+      const params = new URLSearchParams(window.location.search);
+      const urlType  = params.get('type')  || '';
+      const urlCity  = params.get('city')  || '';
+      const urlState = params.get('state') || '';
+
+      if (urlType)  _activeDirType  = urlType;
+      if (urlCity)  _activeDirCity  = urlCity;
+      if (urlState) _activeDirState = urlState;
+
+      // Pre-select type in search bar
+      const typeSel = document.getElementById('dir-type-select');
+      if (typeSel && urlType) typeSel.value = urlType;
+
+      // Pre-fill city input if from URL
+      if (urlCity) {
+        const cityInput = document.getElementById('dir-city-input');
+        if (cityInput) cityInput.value = urlCity + (urlState ? ', ' + urlState : '');
+      }
+
+      // If URL has location params, save them
+      if (urlCity && urlState && !localStorage.getItem('ecm_location')) {
+        saveLocation(urlCity + ', ' + urlState);
+      }
+
+      // Wait for script.js initLocation to finish (may be async IP detection)
+      setTimeout(() => {
+        // Use URL params over saved location for city/state in this session
+        if (!_activeDirCity && currentLocation) {
+          _activeDirCity  = currentLocation.city;
+          _activeDirState = currentLocation.state;
+        }
+        updateDirHeroTitle();
+        renderDirGrid();
+        updateDirLocDisplay();
+        highlightSidebarType(_activeDirType);
+      }, 400);
+    });
+
+    // Re-render when location is updated via modal
+    var _origSaveForDir = null;
+    document.addEventListener('DOMContentLoaded', function() {
+      var _base = saveLocation;
+      window.saveLocation = function(cityState) {
+        _base(cityState);
+        if (currentLocation) {
+          if (!_activeDirCity) {
+            _activeDirCity  = currentLocation.city;
+            _activeDirState = currentLocation.state;
+          }
+          updateDirLocDisplay();
+          updateDirHeroTitle();
+          renderDirGrid();
+        }
+      };
     });
   </script>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div>
+          <p class="footer__brand">ElderCareMatters</p>
+          <p class="footer__tagline">Connecting families with trusted elder care providers across the United States.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"><span class="footer__badge">✓ Verified Providers</span><span class="footer__badge">🔒 Privacy Protected</span><span class="footer__badge">⭐ Free for Families</span></div>
+        </div>
+        <div><p class="footer__col-title">For Families</p><div class="footer__col-links"><a href="how-it-works.html">How It Works</a><a href="directory.html">Find Care</a><a href="blog.html">Resources & Guides</a><a href="consumer-dashboard.html">My Care Request</a></div></div>
+        <div><p class="footer__col-title">For Providers</p><div class="footer__col-links"><a href="for-providers.html">Provider Overview</a><a href="for-providers.html#pricing">Pricing & Plans</a><a href="provider-dashboard.html">Provider Login</a></div></div>
+        <div><p class="footer__col-title">Browse Care</p><div class="footer__col-links"><a href="directory.html">All Providers</a><a href="directory.html?city=Austin&state=TX">Austin, TX</a><a href="directory.html?city=New+York&state=NY">New York, NY</a><a href="directory.html?city=Los+Angeles&state=CA">Los Angeles, CA</a></div></div>
+      </div>
+      <div class="footer__bottom"><p>© 2026 ElderCareMatters. All rights reserved.</p><p>Free for families · Verified providers · No spam</p></div>
+    </div>
+  </footer>
+
 </body>
 </html>
