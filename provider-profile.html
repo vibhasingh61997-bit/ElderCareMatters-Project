@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .profile-section { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius-lg); padding:28px; margin-bottom:20px; }
+    .profile-section__title { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-500); margin-bottom:20px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group label { font-size:.8rem; font-weight:600; color:var(--gray-700); }
+    .form-group input, .form-group select, .form-group textarea { padding:10px 12px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.875rem; color:var(--gray-700); outline:none; font-family:inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--blue-700); }
+    .form-group textarea { resize:vertical; min-height:90px; }
+    .form-full { grid-column:1/-1; }
+    .badge-row { display:flex; align-items:center; gap:12px; padding:16px; background:var(--gray-100); border-radius:var(--radius); }
+    .badge-ecm { display:inline-flex; align-items:center; gap:6px; background:#dcfce7; color:#15803d; font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:20px; }
+    .service-tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .service-tag { background:var(--blue-50); color:var(--blue-700); font-size:.78rem; font-weight:600; padding:4px 12px; border-radius:20px; }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">My Profile</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <span style="font-size:.8rem; color:var(--gray-500);">Sunrise Home Care &nbsp;·&nbsp;</span>
+        <a href="index.html" class="btn btn--ghost btn--sm">← Public Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="dash-layout">
+    <aside class="dash-sidebar">
+      <div class="dash-sidebar__logo">ECM Provider</div>
+      <a href="provider-dashboard.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📊</span> Dashboard</a>
+      <a href="provider-leads.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📥</span> Lead Inbox</a>
+      <a href="provider-billing.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">💳</span> Billing</a>
+      <a href="provider-profile.html" class="dash-sidebar__item active"><span class="dash-sidebar__icon">👤</span> My Profile</a>
+      <a href="provider-settings.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">⚙️</span> Settings</a>
+    </aside>
+
+    <main class="dash-main">
+      <div class="dash-main__header">
+        <div>
+          <h1 class="dash-main__title">My Profile</h1>
+          <p class="dash-main__subtitle">Your public-facing provider listing on ElderCareMatters.</p>
+        </div>
+        <button class="btn btn--primary" onclick="showToast('Profile saved!')">Save Changes</button>
+      </div>
+
+      <!-- ECM Verified Badge -->
+      <div class="profile-section">
+        <p class="profile-section__title">Trust & Verification</p>
+        <div class="badge-row">
+          <span class="badge-ecm">✓ ECM Verified</span>
+          <div>
+            <p style="font-size:.875rem; font-weight:600; color:var(--gray-800);">Your business has been verified by ElderCareMatters.</p>
+            <p style="font-size:.8rem; color:var(--gray-500); margin-top:2px;">This badge appears on your public profile and in the directory.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Info -->
+      <div class="profile-section">
+        <p class="profile-section__title">Business Information</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Business Name</label>
+            <input type="text" value="Sunrise Home Care" />
+          </div>
+          <div class="form-group">
+            <label>Primary Contact Name</label>
+            <input type="text" value="Jennifer Alvarez" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" value="jennifer@sunrisehomecare.com" />
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" value="(512) 555-0198" />
+          </div>
+          <div class="form-group form-full">
+            <label>Business Description</label>
+            <textarea>Sunrise Home Care provides compassionate, professional in-home care services for seniors in the Austin area. Our caregivers are fully licensed, background-checked, and trained in memory care and daily living assistance.</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services & Coverage -->
+      <div class="profile-section">
+        <p class="profile-section__title">Services & Coverage</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Provider Type</label>
+            <select>
+              <option selected>Home Care Agency</option>
+              <option>Assisted Living Facility</option>
+              <option>Memory Care Facility</option>
+              <option>Elder Law Attorney</option>
+              <option>Care Manager</option>
+              <option>Hospice Provider</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Primary City</label>
+            <input type="text" value="Austin, TX" />
+          </div>
+          <div class="form-group form-full">
+            <label>Services Offered</label>
+            <div class="service-tags">
+              <span class="service-tag">Home Care</span>
+              <span class="service-tag">Memory Care</span>
+              <span class="service-tag">Respite Care</span>
+              <span class="service-tag">+ Add service</span>
+            </div>
+          </div>
+          <div class="form-group form-full">
+            <label>Coverage Area</label>
+            <input type="text" value="Austin, Round Rock, Cedar Park, Georgetown, TX" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Credentials -->
+      <div class="profile-section">
+        <p class="profile-section__title">Credentials & Licences</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>State Licence Number</label>
+            <input type="text" value="TX-HHA-20419" />
+          </div>
+          <div class="form-group">
+            <label>Years in Operation</label>
+            <input type="text" value="12 years" />
+          </div>
+          <div class="form-group form-full">
+            <label>Certifications (comma-separated)</label>
+            <input type="text" value="Texas DADS Licensed, CPR Certified Staff, Alzheimer's Association Training" />
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

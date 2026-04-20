@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Content — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Layout ────────────────────────────────────────────── */
+    .content-cols {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── Stats bar ─────────────────────────────────────────── */
+    .content-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .cstat {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .cstat__value { font-size: 1.6rem; font-weight: 800; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+    .cstat__label { font-size: .74rem; color: var(--gray-500); }
+    .cstat__delta { font-size: .7rem; font-weight: 700; margin-top: 6px; }
+    .cstat__delta--up   { color: var(--green-600); }
+    .cstat__delta--flat { color: var(--gray-400); }
+
+    /* ── Article list ──────────────────────────────────────── */
+    .articles-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .articles-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .articles-card__title { font-size: .95rem; font-weight: 700; color: var(--navy); }
+    .btn-new-article {
+      background: var(--blue-600); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: 8px 16px; font-size: .82rem; font-weight: 700;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .btn-new-article:hover { background: #1d4ed8; }
+
+    /* Article row */
+    .article-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--gray-50);
+      transition: background var(--transition);
+    }
+    .article-row:last-child { border-bottom: none; }
+    .article-row:hover { background: var(--gray-50); }
+    .article-row__icon {
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: var(--blue-50); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .article-row__body { flex: 1; min-width: 0; }
+    .article-row__title {
+      font-size: .88rem; font-weight: 700; color: var(--navy);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .article-row__meta { font-size: .74rem; color: var(--gray-500); display: flex; gap: 10px; flex-wrap: wrap; }
+    .article-row__meta span { display: flex; align-items: center; gap: 3px; }
+    .article-row__status {
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: var(--radius-full);
+      border: 1px solid currentColor; flex-shrink: 0;
+    }
+    .status--published { color: var(--green-600); background: var(--green-100); border-color: #86efac; }
+    .status--draft     { color: var(--amber); background: var(--amber-light); border-color: #fcd34d; }
+    .status--review    { color: var(--blue-600); background: var(--blue-50); border-color: #bfdbfe; }
+    .article-row__actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-article-action {
+      background: transparent; color: var(--gray-500);
+      border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+      padding: 5px 11px; font-size: .76rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-article-action:hover { border-color: var(--blue-600); color: var(--blue-600); }
+    .btn-article-action--primary {
+      background: var(--blue-600); color: #fff; border-color: var(--blue-600);
+    }
+    .btn-article-action--primary:hover { background: #1d4ed8; color: #fff; }
+
+    /* ── Editor panel ──────────────────────────────────────── */
+    .editor-panel {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .editor-panel__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      background: var(--gray-50);
+    }
+    .editor-panel__title { font-size: .88rem; font-weight: 700; color: var(--navy); }
+    .editor-draft-tag {
+      font-size: .7rem; font-weight: 700; color: var(--amber);
+      background: var(--amber-light); border: 1px solid #fcd34d;
+      padding: 2px 9px; border-radius: var(--radius-full);
+    }
+    .editor-toolbar {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .toolbar-btn {
+      background: transparent; border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm); padding: 5px 10px;
+      font-size: .78rem; font-weight: 700; color: var(--gray-600);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .toolbar-btn:hover { background: var(--gray-100); border-color: var(--gray-300); }
+    .editor-title-input {
+      width: 100%; border: none; outline: none;
+      font-size: 1.1rem; font-weight: 700; color: var(--navy);
+      font-family: inherit; padding: 18px 20px 8px;
+    }
+    .editor-title-input::placeholder { color: var(--gray-300); }
+    .editor-body-input {
+      width: 100%; border: none; outline: none; resize: none;
+      font-size: .88rem; color: var(--gray-700); line-height: 1.75;
+      font-family: inherit; padding: 8px 20px 20px;
+      min-height: 200px;
+    }
+    .editor-body-input::placeholder { color: var(--gray-300); }
+    .editor-actions {
+      display: flex; gap: 8px; align-items: center;
+      padding: 12px 20px;
+      border-top: 1px solid var(--gray-100);
+      background: var(--gray-50);
+    }
+    .btn-save-draft {
+      background: transparent; color: var(--gray-600);
+      border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+      padding: 8px 16px; font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-save-draft:hover { border-color: var(--gray-400); }
+    .btn-publish {
+      background: var(--green-600); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: 8px 18px; font-size: .82rem; font-weight: 700; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-publish:hover { background: #15803d; }
+    .editor-auto-save { font-size: .72rem; color: var(--gray-400); margin-left: auto; }
+
+    /* ── Right sidebar ─────────────────────────────────────── */
+    .sidebar-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .sidebar-card__header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .85rem; font-weight: 700; color: var(--navy);
+    }
+    .sidebar-card__body { padding: 16px 18px; }
+
+    /* Keyword suggestions */
+    .kw-item {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .kw-item:last-child { margin-bottom: 0; }
+    .kw-item__text { font-size: .82rem; color: var(--gray-700); font-weight: 500; }
+    .kw-meta { display: flex; gap: 8px; align-items: center; }
+    .kw-vol {
+      font-size: .7rem; color: var(--gray-500);
+      background: var(--gray-100); padding: 2px 7px; border-radius: var(--radius-full);
+    }
+    .kw-diff {
+      font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: var(--radius-full);
+    }
+    .kw-diff--easy { color: var(--green-600); background: var(--green-100); }
+    .kw-diff--med  { color: var(--amber); background: var(--amber-light); }
+    .kw-diff--hard { color: var(--red-700); background: var(--red-100); }
+    .btn-kw-add {
+      background: transparent; color: var(--blue-600);
+      border: 1px solid #bfdbfe; border-radius: var(--radius-sm);
+      padding: 2px 8px; font-size: .7rem; font-weight: 600; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-kw-add:hover { background: var(--blue-50); }
+
+    /* AI assist */
+    .ai-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; font-size: .72rem; font-weight: 700;
+      padding: 3px 10px; border-radius: var(--radius-full);
+      margin-bottom: 10px;
+    }
+    .ai-suggestion {
+      background: var(--gray-50); border: 1px solid var(--gray-200);
+      border-radius: var(--radius); padding: 10px 12px;
+      font-size: .8rem; color: var(--gray-600); line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .ai-suggestion strong { color: var(--navy); }
+    .btn-ai-use {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: 8px 14px; font-size: .8rem; font-weight: 700; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-ai-use:hover { opacity: .9; }
+
+    /* Performance table */
+    .perf-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid var(--gray-50);
+      font-size: .8rem;
+    }
+    .perf-row:last-child { border-bottom: none; }
+    .perf-row__title { color: var(--gray-700); font-weight: 500; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .perf-row__views { color: var(--blue-600); font-weight: 700; }
+    .perf-row__leads { color: var(--green-600); font-weight: 700; }
+
+    @media (max-width: 900px) {
+      .content-cols  { grid-template-columns: 1fr; }
+      .content-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .content-stats { grid-template-columns: 1fr; }
+      .article-row   { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <span style="font-size:.8rem; color:var(--gray-500);">Sunrise Home Care &nbsp;·&nbsp;</span>
+        <a href="index.html" class="btn btn--ghost btn--sm">← Public Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="dash-layout">
+
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div class="dash-sidebar__logo">ECM Provider</div>
+      <a href="provider-dashboard.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">📊</span> Dashboard
+      </a>
+      <a href="provider-leads.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">📥</span> Lead Inbox
+      </a>
+      <a href="provider-content.html" class="dash-sidebar__item active">
+        <span class="dash-sidebar__icon">✍️</span> My Content
+      </a>
+      <a href="provider-billing.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">💳</span> Billing
+      </a>
+      <a href="provider-profile.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">👤</span> My Profile
+      </a>
+      <a href="provider-settings.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">⚙️</span> Settings
+      </a>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+
+      <div class="dash-main__header" style="margin-bottom:22px;">
+        <div>
+          <h1 class="dash-main__title">My Content</h1>
+          <p class="dash-main__subtitle">Publish articles to boost your profile visibility and attract more leads.</p>
+        </div>
+        <button class="btn-new-article" onclick="openEditor()">+ New Article</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="content-stats">
+        <div class="cstat">
+          <div class="cstat__value">3</div>
+          <div class="cstat__label">Articles Published</div>
+          <div class="cstat__delta cstat__delta--up">↑ 1 this month</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat__value">1,240</div>
+          <div class="cstat__label">Total Profile Views</div>
+          <div class="cstat__delta cstat__delta--up">↑ 3× since first article</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat__value">8</div>
+          <div class="cstat__label">Leads from Content</div>
+          <div class="cstat__delta cstat__delta--up">↑ 4 this month</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat__value">1</div>
+          <div class="cstat__label">Drafts in Progress</div>
+          <div class="cstat__delta cstat__delta--flat">Continue writing</div>
+        </div>
+      </div>
+
+      <div class="content-cols">
+
+        <!-- Left: articles list + editor -->
+        <div>
+
+          <!-- Articles list -->
+          <div class="articles-card">
+            <div class="articles-card__header">
+              <span class="articles-card__title">Your Articles</span>
+              <button class="btn-new-article" onclick="openEditor()">+ New Article</button>
+            </div>
+
+            <!-- Published article 1 -->
+            <div class="article-row">
+              <div class="article-row__icon">📰</div>
+              <div class="article-row__body">
+                <div class="article-row__title">Home Care vs. Assisted Living: How to Choose for Your Parent</div>
+                <div class="article-row__meta">
+                  <span>📅 Mar 28, 2026</span>
+                  <span>👁 512 views</span>
+                  <span>🔗 3 leads</span>
+                </div>
+              </div>
+              <span class="article-row__status status--published">Published</span>
+              <div class="article-row__actions">
+                <button class="btn-article-action" onclick="showToast('Opening editor')">Edit</button>
+                <button class="btn-article-action" onclick="showToast('Viewing article')">View</button>
+              </div>
+            </div>
+
+            <!-- Published article 2 -->
+            <div class="article-row">
+              <div class="article-row__icon">📰</div>
+              <div class="article-row__body">
+                <div class="article-row__title">What Medicare Covers for Home Care in Texas (2026 Guide)</div>
+                <div class="article-row__meta">
+                  <span>📅 Mar 10, 2026</span>
+                  <span>👁 487 views</span>
+                  <span>🔗 3 leads</span>
+                </div>
+              </div>
+              <span class="article-row__status status--published">Published</span>
+              <div class="article-row__actions">
+                <button class="btn-article-action" onclick="showToast('Opening editor')">Edit</button>
+                <button class="btn-article-action" onclick="showToast('Viewing article')">View</button>
+              </div>
+            </div>
+
+            <!-- Published article 3 -->
+            <div class="article-row">
+              <div class="article-row__icon">📰</div>
+              <div class="article-row__body">
+                <div class="article-row__title">5 Questions to Ask When Hiring a Home Care Agency in Austin</div>
+                <div class="article-row__meta">
+                  <span>📅 Feb 20, 2026</span>
+                  <span>👁 241 views</span>
+                  <span>🔗 2 leads</span>
+                </div>
+              </div>
+              <span class="article-row__status status--published">Published</span>
+              <div class="article-row__actions">
+                <button class="btn-article-action" onclick="showToast('Opening editor')">Edit</button>
+                <button class="btn-article-action" onclick="showToast('Viewing article')">View</button>
+              </div>
+            </div>
+
+            <!-- Draft -->
+            <div class="article-row" id="draft-row">
+              <div class="article-row__icon" style="background:var(--amber-light);">✏️</div>
+              <div class="article-row__body">
+                <div class="article-row__title">Signs It's Time to Consider Memory Care for a Loved One</div>
+                <div class="article-row__meta">
+                  <span>📅 Draft · Last edited Apr 11, 2026</span>
+                  <span>~420 words</span>
+                </div>
+              </div>
+              <span class="article-row__status status--draft">Draft</span>
+              <div class="article-row__actions">
+                <button class="btn-article-action btn-article-action--primary" onclick="openEditorDraft()">Continue</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Inline editor (hidden by default) -->
+          <div class="editor-panel" id="editor-panel" style="display:none;">
+            <div class="editor-panel__header">
+              <span class="editor-panel__title" id="editor-heading">New Article</span>
+              <span class="editor-draft-tag">Draft</span>
+            </div>
+            <div class="editor-toolbar">
+              <button class="toolbar-btn" onclick="showToast('Bold')"><strong>B</strong></button>
+              <button class="toolbar-btn" onclick="showToast('Italic')"><em>I</em></button>
+              <button class="toolbar-btn" onclick="showToast('Heading')">H2</button>
+              <button class="toolbar-btn" onclick="showToast('List')">• List</button>
+              <button class="toolbar-btn" onclick="showToast('Link')">🔗 Link</button>
+              <button class="toolbar-btn" onclick="showToast('Image')">🖼 Image</button>
+            </div>
+            <input class="editor-title-input" id="editor-title" type="text" placeholder="Article title…" />
+            <textarea class="editor-body-input" id="editor-body" placeholder="Start writing… Use clear, helpful language for families researching elder care options."></textarea>
+            <div class="editor-actions">
+              <button class="btn-save-draft" onclick="showToast('Draft saved')">Save Draft</button>
+              <button class="btn-publish" onclick="publishArticle()">Publish Article</button>
+              <span class="editor-auto-save" id="auto-save-label">Auto-saved</span>
+            </div>
+          </div>
+
+        </div><!-- end left col -->
+
+        <!-- Right sidebar -->
+        <div>
+
+          <!-- Keyword suggestions -->
+          <div class="sidebar-card">
+            <div class="sidebar-card__header">🔍 Keyword Suggestions</div>
+            <div class="sidebar-card__body">
+              <p style="font-size:.75rem; color:var(--gray-500); margin-bottom:12px;">Top searches by families in Austin, TX right now:</p>
+              <div class="kw-item">
+                <span class="kw-item__text">home care Austin TX</span>
+                <div class="kw-meta">
+                  <span class="kw-vol">1.2k/mo</span>
+                  <span class="kw-diff kw-diff--easy">Easy</span>
+                  <button class="btn-kw-add" onclick="addKeyword('home care Austin TX')">+</button>
+                </div>
+              </div>
+              <div class="kw-item">
+                <span class="kw-item__text">senior home care near me</span>
+                <div class="kw-meta">
+                  <span class="kw-vol">880/mo</span>
+                  <span class="kw-diff kw-diff--easy">Easy</span>
+                  <button class="btn-kw-add" onclick="addKeyword('senior home care near me')">+</button>
+                </div>
+              </div>
+              <div class="kw-item">
+                <span class="kw-item__text">how to find home care</span>
+                <div class="kw-meta">
+                  <span class="kw-vol">620/mo</span>
+                  <span class="kw-diff kw-diff--med">Medium</span>
+                  <button class="btn-kw-add" onclick="addKeyword('how to find home care')">+</button>
+                </div>
+              </div>
+              <div class="kw-item">
+                <span class="kw-item__text">Medicare home care coverage</span>
+                <div class="kw-meta">
+                  <span class="kw-vol">490/mo</span>
+                  <span class="kw-diff kw-diff--med">Medium</span>
+                  <button class="btn-kw-add" onclick="addKeyword('Medicare home care coverage')">+</button>
+                </div>
+              </div>
+              <div class="kw-item">
+                <span class="kw-item__text">24 hour home care Austin</span>
+                <div class="kw-meta">
+                  <span class="kw-vol">210/mo</span>
+                  <span class="kw-diff kw-diff--hard">Competitive</span>
+                  <button class="btn-kw-add" onclick="addKeyword('24 hour home care Austin')">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI assist -->
+          <div class="sidebar-card">
+            <div class="sidebar-card__header">✨ AI Writing Assistant</div>
+            <div class="sidebar-card__body">
+              <div class="ai-chip">✨ AI Suggestion</div>
+              <div class="ai-suggestion">
+                <strong>Suggested next article:</strong> "Signs It's Time to Consider Memory Care for a Loved One" — families in Austin searched this 340× last month. You have a draft started!
+              </div>
+              <button class="btn-ai-use" onclick="openEditorDraft()">Continue Draft →</button>
+
+              <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--gray-100);">
+                <div class="ai-chip">✨ Intro suggestion</div>
+                <div class="ai-suggestion">
+                  "For many families in Austin, the signs are subtle at first — a missed medication, a forgotten name. Knowing when to consider memory care can be one of the hardest decisions a family faces."
+                </div>
+                <button class="btn-ai-use" onclick="insertAISuggestion()">Use This Intro →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content performance -->
+          <div class="sidebar-card">
+            <div class="sidebar-card__header">📈 Content Performance</div>
+            <div class="sidebar-card__body">
+              <div style="display:flex; justify-content:space-between; font-size:.7rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--gray-100);">
+                <span>Article</span>
+                <span style="display:flex; gap:20px;"><span>Views</span><span>Leads</span></span>
+              </div>
+              <div class="perf-row">
+                <span class="perf-row__title">Home Care vs. AL</span>
+                <span style="display:flex; gap:20px;"><span class="perf-row__views">512</span><span class="perf-row__leads">3</span></span>
+              </div>
+              <div class="perf-row">
+                <span class="perf-row__title">Medicare Coverage</span>
+                <span style="display:flex; gap:20px;"><span class="perf-row__views">487</span><span class="perf-row__leads">3</span></span>
+              </div>
+              <div class="perf-row">
+                <span class="perf-row__title">5 Questions to Ask</span>
+                <span style="display:flex; gap:20px;"><span class="perf-row__views">241</span><span class="perf-row__leads">2</span></span>
+              </div>
+              <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--gray-100); font-size:.78rem; color:var(--gray-500); line-height:1.5;">
+                💡 Providers with 4+ articles receive <strong style="color:var(--navy);">2.4×</strong> more profile views on average.
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end sidebar -->
+      </div><!-- end content-cols -->
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+  <script>
+    var editorOpen = false;
+
+    function openEditor() {
+      var panel = document.getElementById('editor-panel');
+      var heading = document.getElementById('editor-heading');
+      document.getElementById('editor-title').value = '';
+      document.getElementById('editor-body').value = '';
+      heading.textContent = 'New Article';
+      panel.style.display = 'block';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('editor-title').focus();
+      editorOpen = true;
+    }
+
+    function openEditorDraft() {
+      var panel = document.getElementById('editor-panel');
+      var heading = document.getElementById('editor-heading');
+      document.getElementById('editor-title').value = 'Signs It\'s Time to Consider Memory Care for a Loved One';
+      document.getElementById('editor-body').value = 'For many families in Austin, the signs are subtle at first — a missed medication, a forgotten name. Knowing when to consider memory care can be one of the hardest decisions a family faces.\n\n';
+      heading.textContent = 'Continue Draft';
+      panel.style.display = 'block';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('editor-body').focus();
+      editorOpen = true;
+    }
+
+    function publishArticle() {
+      var title = document.getElementById('editor-title').value.trim();
+      if (!title) { showToast('Please add a title first'); return; }
+      showToast('Article published! It will appear on your profile within minutes.');
+      document.getElementById('editor-panel').style.display = 'none';
+    }
+
+    function addKeyword(kw) {
+      var body = document.getElementById('editor-body');
+      if (document.getElementById('editor-panel').style.display === 'none') { openEditor(); }
+      showToast('Keyword added: ' + kw);
+    }
+
+    function insertAISuggestion() {
+      var body = document.getElementById('editor-body');
+      if (document.getElementById('editor-panel').style.display === 'none') { openEditor(); }
+      body.value = 'For many families in Austin, the signs are subtle at first — a missed medication, a forgotten name. Knowing when to consider memory care can be one of the hardest decisions a family faces.\n\n' + body.value;
+      body.focus();
+      showToast('AI intro inserted into your article');
+    }
+
+    // Auto-save indicator
+    var autoSaveTimer;
+    document.addEventListener('input', function(e) {
+      if (e.target.id === 'editor-title' || e.target.id === 'editor-body') {
+        clearTimeout(autoSaveTimer);
+        document.getElementById('auto-save-label').textContent = 'Saving…';
+        autoSaveTimer = setTimeout(function() {
+          document.getElementById('auto-save-label').textContent = 'Auto-saved ✓';
+        }, 1200);
+      }
+    });
+  </script>
+</body>
+</html>

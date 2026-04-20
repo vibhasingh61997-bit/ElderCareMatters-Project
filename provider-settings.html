@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — ElderCareMatters</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .settings-section { background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--radius-lg); padding:28px; margin-bottom:20px; }
+    .settings-section__title { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--gray-500); margin-bottom:20px; }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--gray-100); gap:20px; }
+    .setting-row:last-child { border-bottom:none; padding-bottom:0; }
+    .setting-row:first-of-type { padding-top:0; }
+    .setting-label { font-size:.875rem; font-weight:600; color:var(--gray-800); }
+    .setting-desc { font-size:.8rem; color:var(--gray-500); margin-top:2px; }
+    .toggle { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:var(--gray-300); border-radius:24px; cursor:pointer; transition:.2s; }
+    .toggle-slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.2s; }
+    .toggle input:checked + .toggle-slider { background:var(--blue-700); }
+    .toggle input:checked + .toggle-slider:before { transform:translateX(20px); }
+    .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .form-group:last-child { margin-bottom:0; }
+    .form-group label { font-size:.8rem; font-weight:600; color:var(--gray-700); }
+    .form-group input, .form-group select { padding:10px 12px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.875rem; color:var(--gray-700); outline:none; }
+    .form-group input:focus, .form-group select:focus { border-color:var(--blue-700); }
+    .danger-zone { border-color:#fca5a5; }
+    .danger-zone .settings-section__title { color:#dc2626; }
+  </style>
+</head>
+<body>
+
+  <span class="wf-label">Settings</span>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="header__logo">Elder<span>Care</span>Matters</a>
+      <nav class="header__nav">
+        <span style="font-size:.8rem; color:var(--gray-500);">Sunrise Home Care &nbsp;·&nbsp;</span>
+        <a href="index.html" class="btn btn--ghost btn--sm">← Public Site</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="dash-layout">
+    <aside class="dash-sidebar">
+      <div class="dash-sidebar__logo">ECM Provider</div>
+      <a href="provider-dashboard.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📊</span> Dashboard</a>
+      <a href="provider-leads.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">📥</span> Lead Inbox</a>
+      <a href="provider-billing.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">💳</span> Billing</a>
+      <a href="provider-profile.html" class="dash-sidebar__item"><span class="dash-sidebar__icon">👤</span> My Profile</a>
+      <a href="provider-settings.html" class="dash-sidebar__item active"><span class="dash-sidebar__icon">⚙️</span> Settings</a>
+    </aside>
+
+    <main class="dash-main">
+      <div class="dash-main__header">
+        <div>
+          <h1 class="dash-main__title">Settings</h1>
+          <p class="dash-main__subtitle">Manage your account preferences and notifications.</p>
+        </div>
+        <button class="btn btn--primary" onclick="showToast('Settings saved!')">Save Changes</button>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-section">
+        <p class="settings-section__title">Notifications</p>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">New lead available</p>
+            <p class="setting-desc">Get notified when a new lead matches your coverage area.</p>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">Lead purchased confirmation</p>
+            <p class="setting-desc">Receive a confirmation email when you purchase a lead.</p>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">Consumer message received</p>
+            <p class="setting-desc">Notify me when a consumer replies to my message.</p>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">Monthly billing summary</p>
+            <p class="setting-desc">Receive a monthly recap of leads, spend, and conversions.</p>
+          </div>
+          <label class="toggle"><input type="checkbox" /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">ECM platform updates</p>
+            <p class="setting-desc">Product news, new features, and announcements.</p>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Lead Preferences -->
+      <div class="settings-section">
+        <p class="settings-section__title">Lead Preferences</p>
+        <div class="form-group">
+          <label>Maximum lead price I'll auto-receive</label>
+          <select>
+            <option>No limit</option>
+            <option>Up to $25</option>
+            <option selected>Up to $50</option>
+            <option>Up to $75</option>
+            <option>Up to $100</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Minimum Lead Quality Score (LQS)</label>
+          <select>
+            <option>Any score</option>
+            <option>60+</option>
+            <option selected>70+</option>
+            <option>80+</option>
+            <option>90+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Minimum Lead Intent Score (LIS)</label>
+          <select>
+            <option>Any score</option>
+            <option>60+</option>
+            <option selected>70+</option>
+            <option>80+</option>
+            <option>90+</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Account -->
+      <div class="settings-section">
+        <p class="settings-section__title">Account</p>
+        <div class="form-group">
+          <label>Login Email</label>
+          <input type="email" value="jennifer@sunrisehomecare.com" />
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" placeholder="Leave blank to keep current password" />
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="settings-section danger-zone">
+        <p class="settings-section__title">Danger Zone</p>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">Pause my account</p>
+            <p class="setting-desc">Temporarily stop receiving leads. Your subscription continues.</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" onclick="showToast('Account paused.')">Pause Account</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <p class="setting-label">Delete account</p>
+            <p class="setting-desc">Permanently remove your account and all data. This cannot be undone.</p>
+          </div>
+          <button class="btn btn--ghost btn--sm" style="color:#dc2626; border-color:#fca5a5;" onclick="showToast('Please contact support to delete your account.')">Delete Account</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

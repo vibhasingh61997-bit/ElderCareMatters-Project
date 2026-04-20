@@ -6,17 +6,472 @@
   <title>Lead Marketplace — ElderCareMatters</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .filter-bar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
-    .filter-bar select { padding:8px 12px; border:1.5px solid var(--gray-200); border-radius:var(--radius); font-size:.85rem; color:var(--gray-700); background:var(--white); outline:none; cursor:pointer; }
-    .filter-bar select:focus { border-color:var(--blue-700); }
-    .legend { display:flex; gap:20px; font-size:.75rem; color:var(--gray-500); margin-bottom:16px; flex-wrap:wrap; }
-    .legend span { display:flex; align-items:center; gap:4px; }
-    .leads-list { display:flex; flex-direction:column; gap:14px; }
+    /* ── Page-level layout ─────────────────────────────────── */
+    .leads-page { display:flex; flex-direction:column; gap:0; }
+
+    /* ── Featured access banner ────────────────────────────── */
+    .featured-banner {
+      background: linear-gradient(135deg, #1a2f4e 0%, #1d4ed8 100%);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .featured-banner__left { display:flex; align-items:center; gap:14px; }
+    .featured-banner__crown {
+      font-size: 2rem;
+      background: rgba(255,255,255,.12);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink: 0;
+    }
+    .featured-banner__text h3 { color:#fff; font-size:1rem; font-weight:700; margin-bottom:2px; }
+    .featured-banner__text p  { color:rgba(255,255,255,.75); font-size:.82rem; line-height:1.4; }
+    .featured-banner__timer {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .featured-banner__timer-label { color:rgba(255,255,255,.65); font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; font-weight:600; margin-bottom:4px; }
+    .featured-banner__timer-value { color:#fff; font-size:1.5rem; font-weight:800; font-variant-numeric: tabular-nums; letter-spacing:.03em; }
+    .featured-banner__timer-sub   { color:rgba(255,255,255,.6); font-size:.68rem; margin-top:2px; }
+
+    /* ── Tab bar ───────────────────────────────────────────── */
+    .leads-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 24px;
+    }
+    .leads-tab {
+      padding: 10px 22px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color var(--transition), border-color var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .leads-tab:hover { color: var(--navy); }
+    .leads-tab.active { color: var(--blue-600); border-bottom-color: var(--blue-600); }
+    .leads-tab .tab-count {
+      background: var(--gray-200);
+      color: var(--gray-600);
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+      min-width: 22px;
+      text-align: center;
+    }
+    .leads-tab.active .tab-count { background: var(--blue-100); color: var(--blue-600); }
+
+    /* ── Filter bar ────────────────────────────────────────── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-row__label { font-size: .82rem; font-weight: 600; color: var(--gray-600); flex-shrink:0; }
+    .filter-select {
+      padding: 7px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: .82rem;
+      color: var(--gray-700);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--transition);
+    }
+    .filter-select:focus { border-color: var(--blue-600); }
+    .filter-row__spacer { flex:1; }
+    .score-legend {
+      display: flex;
+      gap: 18px;
+      font-size: .74rem;
+      color: var(--gray-500);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .score-legend span { display:flex; align-items:center; gap:5px; }
+    .score-legend .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .dot--lqs { background: var(--green-600); }
+    .dot--lis { background: var(--blue-600); }
+
+    /* ── Lead panel (tab content) ──────────────────────────── */
+    .leads-panel { display:none; flex-direction:column; gap:16px; }
+    .leads-panel.active { display:flex; }
+
+    /* ── Lead card v2 ──────────────────────────────────────── */
+    .lead-card-v2 {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition), border-color var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .lead-card-v2:hover { box-shadow: var(--shadow-md); border-color: var(--gray-300); }
+    .lead-card-v2--featured {
+      border-color: #1d4ed8;
+      border-left: 4px solid #1d4ed8;
+      background: linear-gradient(to right, #eff6ff 0%, #fff 180px);
+    }
+    .lead-card-v2--purchased {
+      border-color: var(--green-600);
+      border-left: 4px solid var(--green-600);
+      background: linear-gradient(to right, #f0fdf4 0%, #fff 180px);
+    }
+    .lead-card-v2--expired {
+      opacity: .6;
+      border-style: dashed;
+    }
+
+    /* Featured glow ribbon */
+    .lead-ribbon {
+      position: absolute;
+      top: 14px; right: -28px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #fff;
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 36px;
+      transform: rotate(45deg);
+      transform-origin: center;
+      box-shadow: 0 2px 8px rgba(29,78,216,.35);
+    }
+
+    /* Main info block */
+    .lead-info { flex: 1; min-width: 0; }
+    .lead-info__tags {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .lead-type-chip {
+      background: var(--navy);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      letter-spacing: .03em;
+    }
+    .urgency-chip {
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      border: 1px solid currentColor;
+    }
+    .urgency-chip--urgent  { color: var(--red-700); background: var(--red-100); border-color: #fca5a5; }
+    .urgency-chip--month   { color: var(--amber); background: var(--amber-light); border-color: #fcd34d; }
+    .urgency-chip--quarter { color: var(--teal); background: var(--teal-light); border-color: #5eead4; }
+    .urgency-chip--passive { color: var(--gray-600); background: var(--gray-100); border-color: var(--gray-300); }
+    .time-chip { font-size:.71rem; color:var(--gray-500); margin-left:2px; }
+
+    .lead-info__meta {
+      font-size: .83rem;
+      color: var(--gray-600);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .lead-info__meta span { display:flex; align-items:center; gap:4px; }
+    .lead-info__locked {
+      font-size: .8rem;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border-radius: var(--radius);
+      padding: 7px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Countdown timer on card */
+    .lead-timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 5px 11px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--blue-700);
+      margin-top: 8px;
+    }
+    .lead-timer svg { width:13px; height:13px; flex-shrink:0; }
+
+    /* Buyers bar */
+    .buyers-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 9px;
+    }
+    .buyers-bar__label { font-size: .73rem; color: var(--gray-500); font-weight:500; }
+    .buyers-slots { display:flex; gap:4px; }
+    .buyers-slot {
+      width: 22px; height: 7px;
+      border-radius: 99px;
+      background: var(--gray-200);
+    }
+    .buyers-slot--taken { background: var(--amber); }
+    .buyers-slot--me    { background: var(--green-600); }
+
+    /* Unlocked contact block */
+    .lead-contact {
+      background: var(--green-100);
+      border: 1px solid #86efac;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .lead-contact h4 { font-size:.78rem; font-weight:700; color:var(--green-600); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; }
+    .lead-contact p  { font-size:.85rem; color:var(--gray-700); line-height:1.6; }
+
+    /* Score bars block */
+    .lead-scores {
+      width: 140px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 4px;
+    }
+    .score-bar-group {}
+    .score-bar-group__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+    .score-bar-group__label { font-size:.72rem; font-weight:700; color:var(--gray-600); text-transform:uppercase; letter-spacing:.05em; }
+    .score-bar-group__value { font-size:.95rem; font-weight:800; }
+    .score-bar-group__value--lqs { color: var(--green-600); }
+    .score-bar-group__value--lis { color: var(--blue-600); }
+    .score-bar-track {
+      height: 7px;
+      background: var(--gray-200);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .score-bar-fill--lqs { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .score-bar-fill--lis { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+    .score-bar-group__sub { font-size:.66rem; color:var(--gray-400); margin-top:3px; }
+
+    /* Price / action block */
+    .lead-action {
+      width: 150px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .lead-price {
+      text-align: center;
+    }
+    .lead-price__amount {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .lead-price__amount--paid { color: var(--green-600); }
+    .lead-price__label { font-size:.7rem; color:var(--gray-500); margin-top:2px; }
+    .lead-price__breakdown {
+      font-size: .68rem;
+      color: var(--gray-400);
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 1px dashed var(--gray-300);
+      display: inline-block;
+      margin-top: 3px;
+    }
+    .price-tooltip {
+      display: none;
+      position: absolute;
+      right: 160px;
+      background: var(--gray-900);
+      color: #fff;
+      font-size: .72rem;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      line-height: 1.6;
+      width: 200px;
+      z-index: 10;
+      box-shadow: var(--shadow-md);
+    }
+    .price-tooltip.visible { display:block; }
+    .price-tooltip::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-color: var(--gray-900);
+      border-right: none;
+    }
+
+    .btn-purchase {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue-600), #1d4ed8);
+      color: #fff;
+      font-size: .83rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-blue);
+      text-align: center;
+    }
+    .btn-purchase:hover { transform:translateY(-1px); box-shadow: 0 6px 24px rgba(29,78,216,.35); }
+    .btn-purchase:active { transform:translateY(0); }
+    .btn-purchase:disabled { background: var(--gray-300); color: var(--gray-500); box-shadow:none; cursor:not-allowed; transform:none; }
+    .btn-unlocked {
+      width: 100%;
+      background: var(--green-100);
+      color: var(--green-600);
+      font-size: .82rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: 1.5px solid #86efac;
+      cursor: default;
+      text-align: center;
+    }
+    .btn-expired {
+      width: 100%;
+      background: var(--gray-100);
+      color: var(--gray-500);
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      border: 1.5px dashed var(--gray-300);
+      cursor: default;
+      text-align: center;
+    }
+
+    /* ── Purchase success overlay ──────────────────────────── */
+    .purchase-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn .2s ease;
+    }
+    .purchase-modal {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 40px 36px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      animation: fadeInUp .3s ease;
+    }
+    .purchase-modal__icon {
+      width: 68px; height:68px;
+      background: var(--green-100);
+      border-radius: 50%;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 2rem;
+      margin: 0 auto 18px;
+    }
+    .purchase-modal h2 { font-size:1.25rem; font-weight:800; color:var(--navy); margin-bottom:8px; }
+    .purchase-modal p  { font-size:.88rem; color:var(--gray-500); margin-bottom:20px; line-height:1.5; }
+    .purchase-modal__contact {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .purchase-modal__contact p { font-size:.88rem; color:var(--gray-700); margin-bottom:0; line-height:1.8; }
+    .purchase-modal__contact strong { color: var(--navy); }
+    .purchase-modal__actions { display:flex; gap:10px; justify-content:center; }
+    .btn-modal-primary {
+      background: var(--blue-600); color:#fff;
+      padding:10px 22px; border-radius:var(--radius);
+      font-size:.85rem; font-weight:700; border:none; cursor:pointer;
+      transition: all var(--transition);
+    }
+    .btn-modal-primary:hover { background: #1d4ed8; }
+    .btn-modal-ghost {
+      background: transparent; color:var(--gray-500);
+      padding:10px 22px; border-radius:var(--radius);
+      font-size:.85rem; font-weight:600;
+      border:1.5px solid var(--gray-200); cursor:pointer;
+      transition: all var(--transition);
+    }
+    .btn-modal-ghost:hover { border-color:var(--gray-400); color:var(--gray-700); }
+
+    /* ── Empty state ───────────────────────────────────────── */
+    .leads-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-500);
+    }
+    .leads-empty__icon { font-size:2.5rem; margin-bottom:14px; }
+    .leads-empty h3 { font-size:1rem; font-weight:700; color:var(--gray-700); margin-bottom:6px; }
+    .leads-empty p { font-size:.85rem; max-width:320px; margin:0 auto; }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      .lead-card-v2 { flex-direction: column; gap:14px; }
+      .lead-scores { width:100%; flex-direction:row; gap:20px; }
+      .lead-action  { width:100%; flex-direction:row; align-items:center; }
+      .featured-banner { flex-direction:column; align-items:flex-start; }
+    }
   </style>
 </head>
 <body>
-
-  <span class="wf-label">Screen 5 · Lead Marketplace</span>
 
   <header class="header">
     <div class="container header__inner">
@@ -39,13 +494,16 @@
       <a href="provider-leads.html" class="dash-sidebar__item active">
         <span class="dash-sidebar__icon">📥</span> Lead Inbox
       </a>
-      <a href="#" class="dash-sidebar__item">
+      <a href="provider-content.html" class="dash-sidebar__item">
+        <span class="dash-sidebar__icon">✍️</span> My Content
+      </a>
+      <a href="provider-billing.html" class="dash-sidebar__item">
         <span class="dash-sidebar__icon">💳</span> Billing
       </a>
-      <a href="#" class="dash-sidebar__item">
+      <a href="provider-profile.html" class="dash-sidebar__item">
         <span class="dash-sidebar__icon">👤</span> My Profile
       </a>
-      <a href="#" class="dash-sidebar__item">
+      <a href="provider-settings.html" class="dash-sidebar__item">
         <span class="dash-sidebar__icon">⚙️</span> Settings
       </a>
     </aside>
@@ -53,182 +511,648 @@
     <!-- Main -->
     <main class="dash-main">
 
-      <div class="dash-main__header">
+      <div class="dash-main__header" style="margin-bottom:22px;">
         <div>
           <h1 class="dash-main__title">Lead Marketplace</h1>
-          <p class="dash-main__subtitle">Leads matched to your coverage area. Purchase to unlock full contact info.</p>
+          <p class="dash-main__subtitle">Leads matched to your coverage area — purchase to unlock full contact info.</p>
         </div>
-        <span class="badge badge--blue" style="padding:6px 14px; font-size:.8rem;">4 new leads</span>
+        <span class="badge badge--blue" style="padding:7px 16px; font-size:.82rem; border-radius:var(--radius-full); background:var(--blue-100); color:var(--blue-700); font-weight:700; border:1px solid #bfdbfe;">5 new leads</span>
+      </div>
+
+      <!-- Featured Exclusive Banner -->
+      <div class="featured-banner">
+        <div class="featured-banner__left">
+          <div class="featured-banner__crown">🏆</div>
+          <div class="featured-banner__text">
+            <h3>Featured Exclusive Access Window</h3>
+            <p>As a Featured provider, you have first access to new leads for 24 hours before they're shared with other providers. Act quickly — top leads sell fast.</p>
+          </div>
+        </div>
+        <div class="featured-banner__timer">
+          <div class="featured-banner__timer-label">Exclusive window closes</div>
+          <div class="featured-banner__timer-value" id="feat-countdown">18:42:07</div>
+          <div class="featured-banner__timer-sub">on your newest lead</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="leads-tabs">
+        <button class="leads-tab active" onclick="switchTab('available', this)">
+          Available <span class="tab-count" id="cnt-available">5</span>
+        </button>
+        <button class="leads-tab" onclick="switchTab('purchased', this)">
+          Purchased <span class="tab-count" id="cnt-purchased">2</span>
+        </button>
+        <button class="leads-tab" onclick="switchTab('expired', this)">
+          Expired <span class="tab-count" id="cnt-expired">1</span>
+        </button>
       </div>
 
       <!-- Filters -->
-      <div class="filter-bar">
-        <span style="font-size:.82rem; font-weight:600; color:var(--gray-700);">Filter:</span>
-        <select onchange="showToast('Filter applied')">
-          <option>All Care Types</option>
-          <option>Home Care</option>
-          <option>Assisted Living</option>
-          <option>Memory Care</option>
-          <option>Elder Law</option>
+      <div class="filter-row">
+        <span class="filter-row__label">Filter:</span>
+        <select class="filter-select" onchange="filterLeads()">
+          <option value="">All Care Types</option>
+          <option value="Home Care">Home Care</option>
+          <option value="Assisted Living">Assisted Living</option>
+          <option value="Memory Care">Memory Care</option>
+          <option value="Elder Law">Elder Law</option>
+          <option value="Hospice">Hospice</option>
         </select>
-        <select onchange="showToast('Filter applied')">
-          <option>All Urgencies</option>
-          <option>Urgent</option>
-          <option>Within 1 month</option>
-          <option>1–3 months</option>
-          <option>Just researching</option>
+        <select class="filter-select" onchange="filterLeads()">
+          <option value="">All Urgencies</option>
+          <option value="urgent">Urgent</option>
+          <option value="month">Within 1 month</option>
+          <option value="quarter">1–3 months</option>
+          <option value="passive">Just researching</option>
         </select>
-        <select onchange="showToast('Filter applied')">
-          <option>Sort: Newest</option>
-          <option>Sort: Highest LQS</option>
-          <option>Sort: Highest LIS</option>
-          <option>Sort: Price (low–high)</option>
+        <select class="filter-select" onchange="sortLeads(this.value)">
+          <option value="newest">Sort: Newest</option>
+          <option value="lqs">Sort: Highest LQS</option>
+          <option value="lis">Sort: Highest LIS</option>
+          <option value="price-asc">Sort: Price ↑</option>
+          <option value="price-desc">Sort: Price ↓</option>
         </select>
+        <div class="filter-row__spacer"></div>
+        <div class="score-legend">
+          <span><span class="dot dot--lqs"></span> LQS = Data quality (0–100)</span>
+          <span><span class="dot dot--lis"></span> LIS = Intent to convert (0–100)</span>
+        </div>
       </div>
 
-      <!-- Score legend -->
-      <div class="legend">
-        <span><strong style="color:var(--green-600);">LQS</strong> = Lead Quality Score (data reliability, 0–100)</span>
-        <span><strong style="color:var(--blue-700);">LIS</strong> = Lead Intent Score (conversion likelihood, 0–100)</span>
-        <span>🔒 Contact info hidden until purchased</span>
-      </div>
+      <!-- ── AVAILABLE PANEL ──────────────────────────────────────── -->
+      <div class="leads-panel active" id="panel-available">
 
-      <!-- Lead cards -->
-      <div class="leads-list">
-
-        <!-- Lead 1 — available -->
-        <div class="lead-card" data-lead-id="1">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-              <span class="lead-card__type">Home Care</span>
-              <span class="badge badge--red">Urgent</span>
-              <span class="badge badge--gray">2 hours ago</span>
+        <!-- Lead 1 — Featured Exclusive, Urgent, High scores -->
+        <div class="lead-card-v2 lead-card-v2--featured" data-lead-id="L001">
+          <div class="lead-ribbon">Featured Exclusive</div>
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Home Care</span>
+              <span class="urgency-chip urgency-chip--urgent">Urgent</span>
+              <span class="time-chip">38 minutes ago</span>
             </div>
-            <p class="lead-card__meta">📍 Austin, TX &nbsp;·&nbsp; Budget: $3,000–$4,000/mo &nbsp;·&nbsp; Decision-maker</p>
-            <p class="lead-card__locked">🔒 Contact info hidden — purchase to unlock</p>
-          </div>
-          <div class="lead-card__scores">
-            <div class="score-box score-box--lqs">
-              <p class="score-box__label">LQS</p>
-              <p class="score-box__value">88</p>
+            <div class="lead-info__meta">
+              <span>📍 Austin, TX</span>
+              <span>💰 Budget $3,500–$4,500/mo</span>
+              <span>👤 Decision-maker</span>
             </div>
-            <div class="score-box score-box--lis">
-              <p class="score-box__label">LIS</p>
-              <p class="score-box__value">92</p>
+            <div class="lead-info__locked">
+              🔒 Name, phone &amp; email hidden — purchase to unlock
+            </div>
+            <div class="lead-timer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Featured exclusive expires in <strong id="timer-L001">18:42:07</strong>
+            </div>
+            <div class="buyers-bar">
+              <span class="buyers-bar__label">Slots: 0 of 3 taken</span>
+              <div class="buyers-slots">
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+              </div>
             </div>
           </div>
-          <div class="lead-card__action">
-            <p class="lead-card__price">$38</p>
-            <button class="btn btn--primary btn--sm lead-card__action-btn" onclick="purchaseLead(1)">Purchase Lead</button>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">88</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:88%"></div></div>
+              <div class="score-bar-group__sub">Excellent data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">94</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:94%"></div></div>
+              <div class="score-bar-group__sub">Very high intent</div>
+            </div>
           </div>
-          <!-- Hidden contact info (revealed on purchase) -->
-          <div class="lead-card__contact" style="display:none; width:100%; margin-top:8px; padding-top:10px; border-top:1px solid var(--gray-200);">
-            <strong>Name:</strong> Sarah M.<br>
-            <strong>Phone:</strong> (512) 555-0101<br>
-            <strong>Email:</strong> sarah.m@email.com
+          <div class="lead-action" style="position:relative;">
+            <div class="lead-price">
+              <div class="lead-price__amount">$42</div>
+              <div class="lead-price__label">one-time purchase</div>
+              <div class="lead-price__breakdown" onclick="toggleTooltip('tt-L001')">How is this priced? ▾</div>
+            </div>
+            <div class="price-tooltip" id="tt-L001">
+              Base $18 × Quality (0.92) × Intent (0.98) × Geo (1.0) = <strong>$42</strong>
+            </div>
+            <button class="btn-purchase" onclick="purchaseLeadV2('L001', this)">Purchase Lead</button>
           </div>
         </div>
 
-        <!-- Lead 2 — available -->
-        <div class="lead-card" data-lead-id="2">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-              <span class="lead-card__type">Assisted Living</span>
-              <span class="badge badge--yellow">Within 1 month</span>
-              <span class="badge badge--gray">Yesterday</span>
+        <!-- Lead 2 — Featured Exclusive, Within 1 month -->
+        <div class="lead-card-v2 lead-card-v2--featured" data-lead-id="L002">
+          <div class="lead-ribbon">Featured Exclusive</div>
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Assisted Living</span>
+              <span class="urgency-chip urgency-chip--month">Within 1 month</span>
+              <span class="time-chip">2 hours ago</span>
             </div>
-            <p class="lead-card__meta">📍 Austin, TX &nbsp;·&nbsp; Budget: $4,000+/mo &nbsp;·&nbsp; Researching options</p>
-            <p class="lead-card__locked">🔒 Contact info hidden — purchase to unlock</p>
-          </div>
-          <div class="lead-card__scores">
-            <div class="score-box score-box--lqs">
-              <p class="score-box__label">LQS</p>
-              <p class="score-box__value">74</p>
+            <div class="lead-info__meta">
+              <span>📍 Round Rock, TX</span>
+              <span>💰 Budget $4,000+/mo</span>
+              <span>👤 Adult child caregiver</span>
             </div>
-            <div class="score-box score-box--lis">
-              <p class="score-box__label">LIS</p>
-              <p class="score-box__value">68</p>
+            <div class="lead-info__locked">
+              🔒 Name, phone &amp; email hidden — purchase to unlock
+            </div>
+            <div class="lead-timer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Featured exclusive expires in <strong id="timer-L002">16:11:33</strong>
+            </div>
+            <div class="buyers-bar">
+              <span class="buyers-bar__label">Slots: 1 of 3 taken</span>
+              <div class="buyers-slots">
+                <div class="buyers-slot buyers-slot--taken"></div>
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+              </div>
             </div>
           </div>
-          <div class="lead-card__action">
-            <p class="lead-card__price">$22</p>
-            <button class="btn btn--primary btn--sm lead-card__action-btn" onclick="purchaseLead(2)">Purchase Lead</button>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">79</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:79%"></div></div>
+              <div class="score-bar-group__sub">Good data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">76</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:76%"></div></div>
+              <div class="score-bar-group__sub">High intent</div>
+            </div>
           </div>
-          <div class="lead-card__contact" style="display:none; width:100%; margin-top:8px; padding-top:10px; border-top:1px solid var(--gray-200);">
-            <strong>Name:</strong> John D.<br>
-            <strong>Phone:</strong> (512) 555-0188<br>
-            <strong>Email:</strong> john.d@email.com
+          <div class="lead-action" style="position:relative;">
+            <div class="lead-price">
+              <div class="lead-price__amount">$29</div>
+              <div class="lead-price__label">one-time purchase</div>
+              <div class="lead-price__breakdown" onclick="toggleTooltip('tt-L002')">How is this priced? ▾</div>
+            </div>
+            <div class="price-tooltip" id="tt-L002">
+              Base $18 × Quality (0.82) × Intent (0.79) × Geo (0.95) = <strong>$29</strong>
+            </div>
+            <button class="btn-purchase" onclick="purchaseLeadV2('L002', this)">Purchase Lead</button>
           </div>
         </div>
 
-        <!-- Lead 3 — already purchased -->
-        <div class="lead-card lead-card--purchased" data-lead-id="3">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-              <span class="lead-card__type">Memory Care</span>
-              <span class="badge badge--yellow">Within 1 month</span>
-              <span class="badge badge--green">Purchased ✓</span>
+        <!-- Lead 3 — Open to Premium tier, Within 1 month -->
+        <div class="lead-card-v2" data-lead-id="L003">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Memory Care</span>
+              <span class="urgency-chip urgency-chip--month">Within 1 month</span>
+              <span class="time-chip">Yesterday</span>
             </div>
-            <p class="lead-card__meta">📍 Round Rock, TX &nbsp;·&nbsp; Budget: $4,000+/mo &nbsp;·&nbsp; Primary caregiver</p>
-            <div class="lead-card__contact" style="margin-top:6px;">
-              <strong>Name:</strong> Maria K.<br>
-              <strong>Phone:</strong> (512) 555-0234<br>
-              <strong>Email:</strong> maria.k@email.com
+            <div class="lead-info__meta">
+              <span>📍 Cedar Park, TX</span>
+              <span>💰 Budget $4,500+/mo</span>
+              <span>👤 Spouse caregiver</span>
             </div>
-          </div>
-          <div class="lead-card__scores">
-            <div class="score-box score-box--lqs">
-              <p class="score-box__label">LQS</p>
-              <p class="score-box__value">91</p>
+            <div class="lead-info__locked">
+              🔒 Name, phone &amp; email hidden — purchase to unlock
             </div>
-            <div class="score-box score-box--lis">
-              <p class="score-box__label">LIS</p>
-              <p class="score-box__value">80</p>
-            </div>
-          </div>
-          <div class="lead-card__action">
-            <p class="lead-card__price lead-card__price--paid">$29</p>
-            <button class="btn btn--ghost btn--sm" disabled>Unlocked ✓</button>
-          </div>
-        </div>
-
-        <!-- Lead 4 — available, low intent -->
-        <div class="lead-card" data-lead-id="4">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-              <span class="lead-card__type">Elder Law</span>
-              <span class="badge badge--gray">Just researching</span>
-              <span class="badge badge--gray">2 days ago</span>
-            </div>
-            <p class="lead-card__meta">📍 Cedar Park, TX &nbsp;·&nbsp; Budget: Not specified &nbsp;·&nbsp; Exploring options</p>
-            <p class="lead-card__locked">🔒 Contact info hidden — purchase to unlock</p>
-          </div>
-          <div class="lead-card__scores">
-            <div class="score-box score-box--lqs">
-              <p class="score-box__label">LQS</p>
-              <p class="score-box__value">65</p>
-            </div>
-            <div class="score-box score-box--lis">
-              <p class="score-box__label">LIS</p>
-              <p class="score-box__value">40</p>
+            <div class="buyers-bar" style="margin-top:9px;">
+              <span class="buyers-bar__label">Slots: 2 of 3 taken — 1 remaining</span>
+              <div class="buyers-slots">
+                <div class="buyers-slot buyers-slot--taken"></div>
+                <div class="buyers-slot buyers-slot--taken"></div>
+                <div class="buyers-slot"></div>
+              </div>
             </div>
           </div>
-          <div class="lead-card__action">
-            <p class="lead-card__price">$14</p>
-            <button class="btn btn--primary btn--sm lead-card__action-btn" onclick="purchaseLead(4)">Purchase Lead</button>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">83</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:83%"></div></div>
+              <div class="score-bar-group__sub">Excellent data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">71</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:71%"></div></div>
+              <div class="score-bar-group__sub">High intent</div>
+            </div>
           </div>
-          <div class="lead-card__contact" style="display:none; width:100%; margin-top:8px; padding-top:10px; border-top:1px solid var(--gray-200);">
-            <strong>Name:</strong> Robert L.<br>
-            <strong>Phone:</strong> (512) 555-0312<br>
-            <strong>Email:</strong> robert.l@email.com
+          <div class="lead-action" style="position:relative;">
+            <div class="lead-price">
+              <div class="lead-price__amount">$26</div>
+              <div class="lead-price__label">one-time purchase</div>
+              <div class="lead-price__breakdown" onclick="toggleTooltip('tt-L003')">How is this priced? ▾</div>
+            </div>
+            <div class="price-tooltip" id="tt-L003">
+              Base $18 × Quality (0.86) × Intent (0.75) × Geo (0.90) = <strong>$26</strong>
+            </div>
+            <button class="btn-purchase" onclick="purchaseLeadV2('L003', this)">Purchase Lead</button>
           </div>
         </div>
 
-      </div><!-- end leads-list -->
+        <!-- Lead 4 — Elder Law, quarter urgency -->
+        <div class="lead-card-v2" data-lead-id="L004">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Elder Law</span>
+              <span class="urgency-chip urgency-chip--quarter">1–3 months</span>
+              <span class="time-chip">2 days ago</span>
+            </div>
+            <div class="lead-info__meta">
+              <span>📍 Pflugerville, TX</span>
+              <span>💰 Budget: Flexible</span>
+              <span>👤 Adult child</span>
+            </div>
+            <div class="lead-info__locked">
+              🔒 Name, phone &amp; email hidden — purchase to unlock
+            </div>
+            <div class="buyers-bar" style="margin-top:9px;">
+              <span class="buyers-bar__label">Slots: 0 of 3 taken</span>
+              <div class="buyers-slots">
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+              </div>
+            </div>
+          </div>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">68</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:68%"></div></div>
+              <div class="score-bar-group__sub">Good data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">58</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:58%"></div></div>
+              <div class="score-bar-group__sub">Moderate intent</div>
+            </div>
+          </div>
+          <div class="lead-action" style="position:relative;">
+            <div class="lead-price">
+              <div class="lead-price__amount">$19</div>
+              <div class="lead-price__label">one-time purchase</div>
+              <div class="lead-price__breakdown" onclick="toggleTooltip('tt-L004')">How is this priced? ▾</div>
+            </div>
+            <div class="price-tooltip" id="tt-L004">
+              Base $18 × Quality (0.71) × Intent (0.61) × Geo (0.88) = <strong>$19</strong>
+            </div>
+            <button class="btn-purchase" onclick="purchaseLeadV2('L004', this)">Purchase Lead</button>
+          </div>
+        </div>
+
+        <!-- Lead 5 — Hospice, passive intent -->
+        <div class="lead-card-v2" data-lead-id="L005">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Hospice</span>
+              <span class="urgency-chip urgency-chip--passive">Just researching</span>
+              <span class="time-chip">3 days ago</span>
+            </div>
+            <div class="lead-info__meta">
+              <span>📍 Georgetown, TX</span>
+              <span>💰 Budget: Not specified</span>
+              <span>👤 Adult child</span>
+            </div>
+            <div class="lead-info__locked">
+              🔒 Name, phone &amp; email hidden — purchase to unlock
+            </div>
+            <div class="buyers-bar" style="margin-top:9px;">
+              <span class="buyers-bar__label">Slots: 0 of 3 taken</span>
+              <div class="buyers-slots">
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+                <div class="buyers-slot"></div>
+              </div>
+            </div>
+          </div>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">61</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:61%"></div></div>
+              <div class="score-bar-group__sub">Fair data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">38</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:38%"></div></div>
+              <div class="score-bar-group__sub">Low intent</div>
+            </div>
+          </div>
+          <div class="lead-action" style="position:relative;">
+            <div class="lead-price">
+              <div class="lead-price__amount">$12</div>
+              <div class="lead-price__label">one-time purchase</div>
+              <div class="lead-price__breakdown" onclick="toggleTooltip('tt-L005')">How is this priced? ▾</div>
+            </div>
+            <div class="price-tooltip" id="tt-L005">
+              Base $18 × Quality (0.63) × Intent (0.40) × Geo (0.82) = <strong>$12</strong>
+            </div>
+            <button class="btn-purchase" onclick="purchaseLeadV2('L005', this)">Purchase Lead</button>
+          </div>
+        </div>
+
+      </div><!-- end panel-available -->
+
+      <!-- ── PURCHASED PANEL ─────────────────────────────────────── -->
+      <div class="leads-panel" id="panel-purchased">
+
+        <!-- Purchased Lead 1 -->
+        <div class="lead-card-v2 lead-card-v2--purchased" data-lead-id="PL001">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Memory Care</span>
+              <span class="urgency-chip urgency-chip--month">Within 1 month</span>
+              <span style="font-size:.72rem; color:var(--green-600); font-weight:700; background:var(--green-100); padding:3px 9px; border-radius:var(--radius-full); border:1px solid #86efac;">Unlocked ✓</span>
+            </div>
+            <div class="lead-info__meta">
+              <span>📍 Round Rock, TX</span>
+              <span>💰 Budget $4,000+/mo</span>
+              <span>👤 Primary caregiver</span>
+            </div>
+            <div class="lead-contact">
+              <h4>Contact Information</h4>
+              <p><strong>Name:</strong> Maria K.<br><strong>Phone:</strong> (512) 555-0234<br><strong>Email:</strong> maria.k@email.com</p>
+            </div>
+          </div>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">91</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:91%"></div></div>
+              <div class="score-bar-group__sub">Excellent</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">80</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:80%"></div></div>
+              <div class="score-bar-group__sub">High intent</div>
+            </div>
+          </div>
+          <div class="lead-action">
+            <div class="lead-price">
+              <div class="lead-price__amount lead-price__amount--paid">$29</div>
+              <div class="lead-price__label">paid</div>
+            </div>
+            <div class="btn-unlocked">Unlocked ✓</div>
+          </div>
+        </div>
+
+        <!-- Purchased Lead 2 -->
+        <div class="lead-card-v2 lead-card-v2--purchased" data-lead-id="PL002">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Home Care</span>
+              <span class="urgency-chip urgency-chip--urgent">Urgent</span>
+              <span style="font-size:.72rem; color:var(--green-600); font-weight:700; background:var(--green-100); padding:3px 9px; border-radius:var(--radius-full); border:1px solid #86efac;">Unlocked ✓</span>
+            </div>
+            <div class="lead-info__meta">
+              <span>📍 Austin, TX</span>
+              <span>💰 Budget $3,000–$4,000/mo</span>
+              <span>👤 Decision-maker</span>
+            </div>
+            <div class="lead-contact">
+              <h4>Contact Information</h4>
+              <p><strong>Name:</strong> Sarah M.<br><strong>Phone:</strong> (512) 555-0101<br><strong>Email:</strong> sarah.m@email.com</p>
+            </div>
+          </div>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">88</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:88%"></div></div>
+              <div class="score-bar-group__sub">Excellent</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">92</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:92%"></div></div>
+              <div class="score-bar-group__sub">Very high intent</div>
+            </div>
+          </div>
+          <div class="lead-action">
+            <div class="lead-price">
+              <div class="lead-price__amount lead-price__amount--paid">$38</div>
+              <div class="lead-price__label">paid</div>
+            </div>
+            <div class="btn-unlocked">Unlocked ✓</div>
+          </div>
+        </div>
+
+      </div><!-- end panel-purchased -->
+
+      <!-- ── EXPIRED PANEL ──────────────────────────────────────── -->
+      <div class="leads-panel" id="panel-expired">
+
+        <div class="lead-card-v2 lead-card-v2--expired" data-lead-id="EL001">
+          <div class="lead-info">
+            <div class="lead-info__tags">
+              <span class="lead-type-chip">Elder Law</span>
+              <span class="urgency-chip urgency-chip--passive">Just researching</span>
+              <span class="time-chip">5 days ago</span>
+            </div>
+            <div class="lead-info__meta">
+              <span>📍 Buda, TX</span>
+              <span>💰 Budget: Not specified</span>
+              <span>👤 Exploring options</span>
+            </div>
+            <div style="font-size:.8rem; color:var(--gray-500); margin-top:8px; background:var(--gray-100); padding:7px 12px; border-radius:var(--radius); display:inline-flex; gap:6px; align-items:center;">
+              ⏱ Exclusive window expired — lead was claimed by other providers
+            </div>
+          </div>
+          <div class="lead-scores">
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LQS</span>
+                <span class="score-bar-group__value score-bar-group__value--lqs">65</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lqs" style="width:65%"></div></div>
+              <div class="score-bar-group__sub">Good data quality</div>
+            </div>
+            <div class="score-bar-group">
+              <div class="score-bar-group__header">
+                <span class="score-bar-group__label">LIS</span>
+                <span class="score-bar-group__value score-bar-group__value--lis">40</span>
+              </div>
+              <div class="score-bar-track"><div class="score-bar-fill score-bar-fill--lis" style="width:40%"></div></div>
+              <div class="score-bar-group__sub">Low intent</div>
+            </div>
+          </div>
+          <div class="lead-action">
+            <div class="lead-price">
+              <div class="lead-price__amount" style="color:var(--gray-400);">$14</div>
+              <div class="lead-price__label">was</div>
+            </div>
+            <div class="btn-expired">Expired</div>
+          </div>
+        </div>
+
+      </div><!-- end panel-expired -->
+
     </main>
+  </div>
+
+  <!-- ── Purchase Success Modal ──────────────────────────────────── -->
+  <div class="purchase-overlay" id="purchase-overlay" style="display:none;" onclick="closePurchaseModal(event)">
+    <div class="purchase-modal">
+      <div class="purchase-modal__icon">✅</div>
+      <h2>Lead Unlocked!</h2>
+      <p>Contact info is now available. Reach out within 24 hours — families who hear back fast are significantly more likely to convert.</p>
+      <div class="purchase-modal__contact" id="modal-contact-info">
+        <p><strong>Name:</strong> —<br><strong>Phone:</strong> —<br><strong>Email:</strong> —</p>
+      </div>
+      <div class="purchase-modal__actions">
+        <button class="btn-modal-primary" onclick="closePurchaseModal()">View in Purchased</button>
+        <button class="btn-modal-ghost" onclick="closePurchaseModal()">Close</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
   <script src="script.js"></script>
+  <script>
+    /* ── Tab switching ──────────────────────────────────────── */
+    function switchTab(name, btn) {
+      document.querySelectorAll('.leads-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.leads-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    /* ── Filter placeholder ─────────────────────────────────── */
+    function filterLeads() { showToast('Filter applied'); }
+    function sortLeads(v)   { showToast('Sorted: ' + v); }
+
+    /* ── Tooltip toggle ─────────────────────────────────────── */
+    function toggleTooltip(id) {
+      document.querySelectorAll('.price-tooltip').forEach(t => {
+        if (t.id !== id) t.classList.remove('visible');
+      });
+      document.getElementById(id).classList.toggle('visible');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.classList.contains('lead-price__breakdown')) {
+        document.querySelectorAll('.price-tooltip').forEach(t => t.classList.remove('visible'));
+      }
+    });
+
+    /* ── Contact data per lead ──────────────────────────────── */
+    const LEAD_CONTACTS = {
+      'L001': { name: 'Patricia W.', phone: '(512) 555-0192', email: 'p.w@gmail.com' },
+      'L002': { name: 'James R.',    phone: '(737) 555-0341', email: 'jreid@email.com' },
+      'L003': { name: 'Diana C.',    phone: '(512) 555-0877', email: 'd.chen@email.com' },
+      'L004': { name: 'Thomas B.',   phone: '(512) 555-0455', email: 'tbennett@email.com' },
+      'L005': { name: 'Linda F.',    phone: '(512) 555-0619', email: 'lfoster@email.com' },
+    };
+
+    /* ── Purchase flow ──────────────────────────────────────── */
+    function purchaseLeadV2(leadId, btn) {
+      // Animate button
+      btn.textContent = 'Processing…';
+      btn.disabled = true;
+      btn.style.background = 'var(--gray-300)';
+
+      setTimeout(function() {
+        const contact = LEAD_CONTACTS[leadId] || { name:'—', phone:'—', email:'—' };
+
+        // Show modal
+        document.getElementById('modal-contact-info').innerHTML =
+          '<p><strong>Name:</strong> ' + contact.name +
+          '<br><strong>Phone:</strong> ' + contact.phone +
+          '<br><strong>Email:</strong> ' + contact.email + '</p>';
+        document.getElementById('purchase-overlay').style.display = 'flex';
+
+        // Update button state
+        btn.textContent = 'Unlocked ✓';
+        btn.className = 'btn-unlocked';
+        btn.style.background = '';
+
+        // Move card to purchased tab (update count badges)
+        var availCount = parseInt(document.getElementById('cnt-available').textContent);
+        var purchCount  = parseInt(document.getElementById('cnt-purchased').textContent);
+        document.getElementById('cnt-available').textContent  = Math.max(0, availCount - 1);
+        document.getElementById('cnt-purchased').textContent  = purchCount + 1;
+
+        // Update the card visually
+        var card = document.querySelector('[data-lead-id="' + leadId + '"]');
+        if (card) {
+          card.classList.add('lead-card-v2--purchased');
+          card.classList.remove('lead-card-v2--featured');
+          var ribbon = card.querySelector('.lead-ribbon');
+          if (ribbon) ribbon.remove();
+          var timer  = card.querySelector('.lead-timer');
+          if (timer) timer.remove();
+          var locked = card.querySelector('.lead-info__locked');
+          if (locked) {
+            var c = LEAD_CONTACTS[leadId];
+            locked.outerHTML = '<div class="lead-contact"><h4>Contact Information</h4>' +
+              '<p><strong>Name:</strong> ' + c.name + '<br><strong>Phone:</strong> ' + c.phone +
+              '<br><strong>Email:</strong> ' + c.email + '</p></div>';
+          }
+        }
+      }, 900);
+    }
+
+    function closePurchaseModal(e) {
+      if (e && e.target !== document.getElementById('purchase-overlay')) return;
+      document.getElementById('purchase-overlay').style.display = 'none';
+    }
+
+    /* ── Countdown timers ───────────────────────────────────── */
+    var timers = {
+      'feat-countdown': { h:18, m:42, s:7 },
+      'timer-L001':     { h:18, m:42, s:7 },
+      'timer-L002':     { h:16, m:11, s:33 },
+    };
+
+    function formatTime(t) {
+      return String(t.h).padStart(2,'0') + ':' +
+             String(t.m).padStart(2,'0') + ':' +
+             String(t.s).padStart(2,'0');
+    }
+
+    function tickTimers() {
+      for (var id in timers) {
+        var t = timers[id];
+        var el = document.getElementById(id);
+        if (!el) continue;
+        t.s--;
+        if (t.s < 0) { t.s = 59; t.m--; }
+        if (t.m < 0) { t.m = 59; t.h--; }
+        if (t.h < 0) { t.h = 0; t.m = 0; t.s = 0; }
+        el.textContent = formatTime(t);
+      }
+    }
+    setInterval(tickTimers, 1000);
+  </script>
 </body>
 </html>
